@@ -202,13 +202,26 @@ def main():
 
     print(f"   Processed: {len(processed)} deals ({errors} errors)")
 
-    # Filter to active funnels
-    active_funnels = [
+    # Log unique funnel names for debugging
+    unique_funnels = sorted(set(d["f"] for d in processed if d["f"]))
+    print(f"   Unique funnels found: {unique_funnels}")
+
+    # Filter to active funnels (use normalized comparison for accent handling)
+    active_funnels_raw = [
         "Poço Artesiano", "Outorga", "Hidropaas", "Irrigação",
         "Manutenção", "Filtro", "Sondagem SPT", "Análise de água", "Funil Padrão"
     ]
-    filtered = [d for d in processed if d["f"] in active_funnels]
-    print(f"   Active funnels: {len(filtered)} deals")
+    def normalize_str(s):
+        import unicodedata
+        return unicodedata.normalize("NFKD", s.lower().strip()).encode("ascii", "ignore").decode("ascii")
+    active_normalized = [normalize_str(x) for x in active_funnels_raw]
+    filtered = [d for d in processed if normalize_str(d["f"]) in active_normalized]
+    print(f"   Active funnels matched: {len(filtered)} deals")
+
+    # If no matches, skip filter and use all deals
+    if len(filtered) == 0 and len(processed) > 0:
+        print("   WARNING: No funnel matches! Using ALL deals instead.")
+        filtered = processed
 
     # Stats
     vendas = [d for d in filtered if d["e"] == "Vendida"]
