@@ -1,5 +1,7 @@
 {
-  "last_update": "awaiting first run",
+  "last_updated": "2026-04-17T19:56:54",
   "total_deals": 0,
-  "source": "RD Station CRM API"
+  "total_vendas": 0,
+  "total_faturamento": 0,
+  "funnels": []
 }
