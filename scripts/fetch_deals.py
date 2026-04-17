@@ -16,6 +16,8 @@ TOKEN = os.environ.get("RD_TOKEN", "")
 API_BASE = "https://crm.rdstation.com/api/v1"
 LIMIT = 200  # max per page
 
+MAX_PAGES = 50  # RD Station API limit: 50 pages * 200 = 10,000 deals max
+
 def fetch_page(endpoint, page=1, params=""):
     url = f"{API_BASE}/{endpoint}?token={TOKEN}&limit={LIMIT}&page={page}{params}"
     for attempt in range(3):
@@ -30,6 +32,9 @@ def fetch_page(endpoint, page=1, params=""):
                 print(f"  Rate limited, waiting {wait}s...")
                 time.sleep(wait)
                 continue
+            if e.code == 400 and page > MAX_PAGES:
+                print(f"  API pagination limit reached at page {page}")
+                return None
             raise
         except Exception as e:
             if attempt < 2:
@@ -67,6 +72,12 @@ def fetch_all_deals():
 
         # Check if we've fetched all
         if len(all_deals) >= data.get("total", float("inf")):
+            break
+
+        # RD Station API limits pagination to ~10,000 records
+        if page >= MAX_PAGES:
+            print(f"\n   Reached API pagination limit ({MAX_PAGES} pages = {len(all_deals)} deals)")
+            print(f"   Total in CRM: {data.get('total', '?')} — fetched most recent {len(all_deals)}")
             break
 
         page += 1
