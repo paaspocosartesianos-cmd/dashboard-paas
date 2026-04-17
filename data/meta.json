@@ -1,7 +1,9 @@
 {
-  "last_updated": "2026-04-17T19:56:54",
-  "total_deals": 0,
+  "last_updated": "2026-04-17T20:07:38",
+  "total_deals": 10000,
   "total_vendas": 0,
   "total_faturamento": 0,
-  "funnels": []
+  "funnels": [
+    ""
+  ]
 }
