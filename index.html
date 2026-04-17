@@ -2657,21 +2657,24 @@ async function doLogin(){
   if(hash===PWD_HASH){
     document.getElementById("pwd-error").style.display="none";
     document.getElementById("loading-msg").style.display="block";
-    await loadData();
+    try { await loadData(); } catch(e){ console.warn("loadData error:",e); }
     document.getElementById("login-screen").style.display="none";
   } else {
     document.getElementById("pwd-error").style.display="block";
   }
 }
 async function loadData(){
+  var cacheBust = "?t=" + Date.now();
   try {
-    const resp = await fetch("data/deals.json");
+    const resp = await fetch("data/deals.json" + cacheBust);
     if(resp.ok){
       DEALS = await resp.json();
       console.log("Loaded "+DEALS.length+" deals from API");
+    } else {
+      console.warn("deals.json status:", resp.status);
     }
     try {
-      const metaResp = await fetch("data/meta.json");
+      const metaResp = await fetch("data/meta.json" + cacheBust);
       if(metaResp.ok){
         const meta = await metaResp.json();
         if(meta.last_updated){
@@ -2680,7 +2683,7 @@ async function loadData(){
           if(el) el.textContent = "Atualizado: " + dt.toLocaleString("pt-BR");
         }
       }
-    } catch(e){}
+    } catch(e){ console.warn("meta.json error:", e); }
   } catch(e){
     console.warn("Fetch failed:", e);
   }
