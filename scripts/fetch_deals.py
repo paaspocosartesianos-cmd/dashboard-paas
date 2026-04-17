@@ -165,10 +165,11 @@ def process_deal(deal, stage_map=None):
     contacts = deal.get("contacts", [])
     contact = contacts[0] if contacts else {}
     user = deal.get("user", {}) or {}
+    # RD Station API: win=true (won), win=false (lost), win=null (open)
     win = deal.get("win")
-    if win == "won":
+    if win is True or win == "won":
         estado = "Vendida"
-    elif win == "lost":
+    elif win is False or win == "lost":
         estado = "Perdida"
     else:
         estado = "Em Andamento"
