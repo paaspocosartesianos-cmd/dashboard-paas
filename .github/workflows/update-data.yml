@@ -1,0 +1,39 @@
+name: Update Dashboard Data
+
+on:
+  schedule:
+    # Roda a cada 6 horas (00:00, 06:00, 12:00, 18:00 UTC)
+    - cron: '0 */6 * * *'
+  workflow_dispatch: # Permite rodar manualmente pelo GitHub
+
+jobs:
+  fetch-data:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Fetch deals from RD Station
+        env:
+          RD_TOKEN: ${{ secrets.RD_TOKEN }}
+        run: python scripts/fetch_deals.py
+
+      - name: Commit and push updated data
+        run: |
+          git config user.name "GitHub Actions Bot"
+          git config user.email "actions@github.com"
+          git add data/deals.json data/meta.json
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Auto-update: fetch latest CRM data $(date +'%Y-%m-%d %H:%M')"
+            git push
+          fi
