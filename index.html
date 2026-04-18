@@ -524,7 +524,7 @@ function renderAll(){
   document.getElementById("kpis").innerHTML = [
     {lb:"Faturamento",vl:fmt(totF),cl:"#27AE60",sb:fatSub,click:"drillEstado(\'Vendida\')"},
     {lb:"Vendas",vl:totV,cl:"#065A82",sb:venSub,click:"drillEstado(\'Vendida\')"},
-    {lb:mode==="fechamento"?"Fechamentos":"Oportunidades",vl:mode==="fechamento"?(totV+totP):totL,cl:"#3B82F6",sb:mode==="fechamento"?'<div class="sb">'+totV+' vendas + '+totP+' perdas</div>':metaSb(totL,mOpo,pctO,false,false),click:"drillAll()"},
+    {lb:"Oportunidades",vl:totL,cl:"#3B82F6",sb:metaSb(totL,mOpo,pctO,false,false),click:"drillAll()"},
     {lb:"Taxa Conv.",vl:fP(txcG),cl:txcG>=10?"#27AE60":txcG>=5?"#F39C12":"#E74C3C",sb:metaSb(txcG,mTxc,pctT,false,true),click:"drillAll()"},
     {lb:"Ticket Medio",vl:fmt(tickG),cl:"#1B9AAA",sb:metaSb(tickG,mTick,pctTk,true,false),click:"drillEstado(\'Vendida\')"},
     {lb:"Perdas",vl:totP,cl:"#E74C3C",sb:'<div class="sb">'+fP(totL>0?totP/totL*100:0)+' taxa de perda</div>',click:"drillEstado(\'Perdida\')"}
@@ -607,25 +607,21 @@ function renderAll(){
 
   // Funnel table
   document.getElementById("funnel-sub").textContent = "Metas proporcionais a "+months.toFixed(1)+" meses";
-  let fh = '<thead><tr><th style="text-align:left">Funil</th><th>'+(mode==="fechamento"?"Fechamentos":"Leads")+'</th><th>Vendas</th><th>TxC</th><th>Ticket</th><th>Faturamento</th></tr></thead><tbody>';
+  let fh = '<thead><tr><th style="text-align:left">Funil</th><th>'+"Oportunidades"+'</th><th>Vendas</th><th>TxC</th><th>Ticket</th><th>Faturamento</th></tr></thead><tbody>';
   ORDER.forEach(fn=>{
     const r=data.funis[fn];
     const m=METAS_MES[fn]||{};
     const mp=prop;
     const txcR=r.leads>0?r.vendas/r.leads*100:0;
     const tkR=r.vendas>0?r.fat/r.vendas:0;
-    var leadsShow = mode==="fechamento" ? (r.vendas+r.perdas) : r.leads;
+    var leadsShow = r.leads;
     const pO=m.oport*mp>0?leadsShow/(m.oport*mp)*100:0;
     const pV=m.vendas*mp>0?r.vendas/(m.vendas*mp)*100:0;
     const pT=m.txc>0?txcR/m.txc*100:0;
     const pTk=m.ticket>0?tkR/m.ticket*100:0;
     const pF=m.fat*mp>0?r.fat/(m.fat*mp)*100:0;
     fh+='<tr class="clickable" onclick="drillFunil(\''+fn+'\')"><td>'+(LABELS[fn]||fn)+'</td>';
-    if(mode==="fechamento"){
-      fh+='<td>'+leadsShow+' <small style="color:#999">('+r.vendas+'V/'+r.perdas+'P)</small></td>';
-    } else {
-      fh+='<td>'+leadsShow+' / '+Math.round(m.oport*mp)+' '+dotH(pO)+'</td>';
-    }
+    fh+='<td>'+leadsShow+' / '+Math.round(m.oport*mp)+' '+dotH(pO)+'</td>';
     fh+='<td>'+r.vendas+' / '+Math.round(m.vendas*mp)+' '+dotH(pV)+'</td>';
     fh+='<td>'+fP(txcR)+' / '+fP(m.txc)+' '+dotH(pT)+'</td>';
     fh+='<td>'+fmt(Math.round(tkR))+' / '+fmt(m.ticket)+' '+dotH(pTk)+'</td>';
@@ -637,12 +633,8 @@ function renderAll(){
   var metaTotO=Object.values(METAS_MES).reduce((a,m)=>a+m.oport,0)*prop;
   var metaTxcG=Object.values(METAS_MES).reduce((a,m)=>a+m.vendas,0)/Object.values(METAS_MES).reduce((a,m)=>a+m.oport,0)*100;
   var metaTickG=metaTotV>0?Math.round(metaTotF/metaTotV):0;
-  var totLShow = mode==="fechamento" ? (totV+totP) : totL;
-  if(mode==="fechamento"){
-    fh+='<tr style="background:#e0f2fe;font-weight:700"><td>TOTAL</td><td>'+totLShow+' <small style="color:#666">('+totV+'V/'+totP+'P)</small></td><td>'+totV+' / '+Math.round(metaTotV)+' '+dotH(metaTotV>0?totV/metaTotV*100:0)+'</td><td>'+fP(txcG)+' / '+fP(metaTxcG)+' '+dotH(metaTxcG>0?txcG/metaTxcG*100:0)+'</td><td>'+fmt(tickG)+'</td><td>'+fmt(totF)+' / '+fmt(Math.round(metaTotF))+' '+dotH(metaTotF>0?totF/metaTotF*100:0)+'</td></tr>';
-  } else {
-    fh+='<tr style="background:#e0f2fe;font-weight:700"><td>TOTAL</td><td>'+totLShow+' / '+Math.round(metaTotO)+' '+dotH(metaTotO>0?totLShow/metaTotO*100:0)+'</td><td>'+totV+' / '+Math.round(metaTotV)+' '+dotH(metaTotV>0?totV/metaTotV*100:0)+'</td><td>'+fP(txcG)+' / '+fP(metaTxcG)+' '+dotH(metaTxcG>0?txcG/metaTxcG*100:0)+'</td><td>'+fmt(tickG)+'</td><td>'+fmt(totF)+' / '+fmt(Math.round(metaTotF))+' '+dotH(metaTotF>0?totF/metaTotF*100:0)+'</td></tr>';
-  }
+  var totLShow = totL;
+      fh+='<tr style="background:#e0f2fe;font-weight:700"><td>TOTAL</td><td>'+totLShow+' / '+Math.round(metaTotO)+' '+dotH(metaTotO>0?totLShow/metaTotO*100:0)+'</td><td>'+totV+' / '+Math.round(metaTotV)+' '+dotH(metaTotV>0?totV/metaTotV*100:0)+'</td><td>'+fP(txcG)+' / '+fP(metaTxcG)+' '+dotH(metaTxcG>0?txcG/metaTxcG*100:0)+'</td><td>'+fmt(tickG)+'</td><td>'+fmt(totF)+' / '+fmt(Math.round(metaTotF))+' '+dotH(metaTotF>0?totF/metaTotF*100:0)+'</td></tr>';
   fh+='</tbody>';
   document.getElementById("ftable").innerHTML = fh;
   
