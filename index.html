@@ -510,22 +510,48 @@ function renderAll(){
   const pctO = mOpo>0?(totL/mOpo*100):0;
   const pctT = mTxc>0?(txcG/mTxc*100):0;
   const pctTk = mTick>0?(tickG/mTick*100):0;
+
+  // === PACING / PROJECAO ===
+  var _hoje = new Date();
+  var _diasDoMes = new Date(_hoje.getFullYear(), _hoje.getMonth()+1, 0).getDate();
+  var _diaAtual = _hoje.getDate();
+  var showPacing = (dtFrom.getMonth() === _hoje.getMonth() && dtFrom.getFullYear() === _hoje.getFullYear() && _diaAtual > 1);
+  var mFatFull = Object.values(METAS_MES).reduce(function(a,m){return a+m.fat},0);
+  var mVenFull = Object.values(METAS_MES).reduce(function(a,m){return a+m.vendas},0);
+  var mOpoFull = Object.values(METAS_MES).reduce(function(a,m){return a+m.oport},0);
+  var mTxcFull = mOpoFull>0?(mVenFull/mOpoFull*100):0;
+  var mTickFull = mVenFull>0?Math.round(mFatFull/mVenFull):0;
+  var projFat = showPacing ? (totF / _diaAtual) * _diasDoMes : 0;
+  var projVen = showPacing ? (totV / _diaAtual) * _diasDoMes : 0;
+  var projOpo = showPacing ? (totL / _diaAtual) * _diasDoMes : 0;
+  var projPctF = mFatFull>0 ? (projFat/mFatFull*100) : 0;
+  var projPctV = mVenFull>0 ? (projVen/mVenFull*100) : 0;
+  var projPctO = mOpoFull>0 ? (projOpo/mOpoFull*100) : 0;
+  function pacingHtml(proj,metaFull,projPct,isMoney){
+    if(!showPacing) return '';
+    var cor = projPct>=100?'#27AE60':projPct>=80?'#F59E0B':'#EF4444';
+    var icon = projPct>=100?'\u25B2':'\u25BC';
+    var val = isMoney ? fmt(Math.round(proj)) : Math.round(proj);
+    return '<div class="sb" style="margin-top:2px;color:'+cor+';font-weight:600">'+icon+' Ritmo: '+val+' proj. ('+Math.round(projPct)+'% da meta mensal)</div>';
+  }
+
   function metaSb(real,meta,pct,isMoney,isPct){
     const dot = pct>=90?'grn':pct>=70?'ylw':'red';
     if(isPct) return '<div class="sb">Meta: '+fP(meta)+' <span class="dot '+dot+'">● '+Math.round(pct)+'%</span></div>';
     if(isMoney) return '<div class="sb">Meta: '+fmt(Math.round(meta))+' <span class="dot '+dot+'">● '+Math.round(pct)+'%</span></div>';
     return '<div class="sb">Meta: '+Math.round(meta)+' <span class="dot '+dot+'">● '+Math.round(pct)+'%</span></div>';
   }
-  // Sub-labels confirmado vs previsto
-  var fatSub = metaSb(totF,mFat,pctF,true,false);
-  if(totFPrev > 0) fatSub = '<div class="sb" style="line-height:1.5">'+fmt(totFConf)+' <span style="color:#27AE60;font-weight:600">confirmado</span> + '+fmt(totFPrev)+' <span style="color:#F59E0B;font-weight:600">previsto</span><br>Meta: '+fmt(Math.round(mFat))+' <span class="dot '+(pctF>=90?"grn":pctF>=70?"ylw":"red")+'">● '+Math.round(pctF)+'%</span></div>';
-  var venSub = metaSb(totV,mVen,pctV,false,false);
-  if(totVPrev > 0) venSub = '<div class="sb" style="line-height:1.5">'+totVConf+' <span style="color:#27AE60;font-weight:600">confirmado</span> + '+totVPrev+' <span style="color:#F59E0B;font-weight:600">previsto</span><br>Meta: '+Math.round(mVen)+' <span class="dot '+(pctV>=90?"grn":pctV>=70?"ylw":"red")+'">● '+Math.round(pctV)+'%</span></div>';
+  // Sub-labels confirmado vs previsto + pacing
+  var fatSub = metaSb(totF,mFat,pctF,true,false) + pacingHtml(projFat,mFatFull,projPctF,true);
+  if(totFPrev > 0) fatSub = '<div class="sb" style="line-height:1.5">'+fmt(totFConf)+' <span style="color:#27AE60;font-weight:600">confirmado</span> + '+fmt(totFPrev)+' <span style="color:#F59E0B;font-weight:600">previsto</span><br>Meta: '+fmt(Math.round(mFat))+' <span class="dot '+(pctF>=90?"grn":pctF>=70?"ylw":"red")+'">● '+Math.round(pctF)+'%</span></div>' + pacingHtml(projFat,mFatFull,projPctF,true);
+  var venSub = metaSb(totV,mVen,pctV,false,false) + pacingHtml(projVen,mVenFull,projPctV,false);
+  if(totVPrev > 0) venSub = '<div class="sb" style="line-height:1.5">'+totVConf+' <span style="color:#27AE60;font-weight:600">confirmado</span> + '+totVPrev+' <span style="color:#F59E0B;font-weight:600">previsto</span><br>Meta: '+Math.round(mVen)+' <span class="dot '+(pctV>=90?"grn":pctV>=70?"ylw":"red")+'">● '+Math.round(pctV)+'%</span></div>' + pacingHtml(projVen,mVenFull,projPctV,false);
+  var opoSub = metaSb(totL,mOpo,pctO,false,false) + pacingHtml(projOpo,mOpoFull,projPctO,false);
 
   document.getElementById("kpis").innerHTML = [
     {lb:"Faturamento",vl:fmt(totF),cl:"#27AE60",sb:fatSub,click:"drillEstado(\'Vendida\')"},
     {lb:"Vendas",vl:totV,cl:"#065A82",sb:venSub,click:"drillEstado(\'Vendida\')"},
-    {lb:"Oportunidades",vl:totL,cl:"#3B82F6",sb:metaSb(totL,mOpo,pctO,false,false),click:"drillAll()"},
+    {lb:"Oportunidades",vl:totL,cl:"#3B82F6",sb:opoSub,click:"drillAll()"},
     {lb:"Taxa Conv.",vl:fP(txcG),cl:txcG>=10?"#27AE60":txcG>=5?"#F39C12":"#E74C3C",sb:metaSb(txcG,mTxc,pctT,false,true),click:"drillAll()"},
     {lb:"Ticket Medio",vl:fmt(tickG),cl:"#1B9AAA",sb:metaSb(tickG,mTick,pctTk,true,false),click:"drillEstado(\'Vendida\')"},
     {lb:"Perdas",vl:totP,cl:"#E74C3C",sb:'<div class="sb">'+fP(totL>0?totP/totL*100:0)+' taxa de perda</div>',click:"drillEstado(\'Perdida\')"}
@@ -533,28 +559,33 @@ function renderAll(){
 
   // ===== GRAFICO BARRAS HTML/CSS — Real vs Meta =====
   var barItems = [
-    {label:"Faturamento",real:totF,meta:Math.round(mFat),pct:pctF,fmt:function(v){return"R$ "+Number(v).toLocaleString("pt-BR",{maximumFractionDigits:0})}},
-    {label:"Vendas",real:totV,meta:Math.round(mVen),pct:pctV,fmt:function(v){return v}},
-    {label:"Oportunidades",real:totL,meta:Math.round(mOpo),pct:pctO,fmt:function(v){return v}},
-    {label:"Taxa Conv.",real:txcG,meta:mTxc,pct:pctT,fmt:function(v){return v.toFixed(1).replace(".",",")+"%"}},
-    {label:"Ticket Medio",real:tickG,meta:mTick,pct:pctTk,fmt:function(v){return"R$ "+Number(Math.round(v)).toLocaleString("pt-BR")}}
+    {label:"Faturamento",real:totF,meta:Math.round(mFat),metaFull:mFatFull,pct:pctF,fmt:function(v){return"R$ "+Number(v).toLocaleString("pt-BR",{maximumFractionDigits:0})}},
+    {label:"Vendas",real:totV,meta:Math.round(mVen),metaFull:mVenFull,pct:pctV,fmt:function(v){return v}},
+    {label:"Oportunidades",real:totL,meta:Math.round(mOpo),metaFull:mOpoFull,pct:pctO,fmt:function(v){return v}},
+    {label:"Taxa Conv.",real:txcG,meta:mTxc,metaFull:mTxcFull,pct:pctT,fmt:function(v){return v.toFixed(1).replace(".",",")+"%"}},
+    {label:"Ticket Medio",real:tickG,meta:mTick,metaFull:mTickFull,pct:pctTk,fmt:function(v){return"R$ "+Number(Math.round(v)).toLocaleString("pt-BR")}}
   ];
+  barItems.forEach(function(b){ b.pctFull = b.metaFull>0 ? (b.real/b.metaFull*100) : 0; });
+  var hasFullMeta = showPacing && prop < 0.95;
   var maxPct = Math.max.apply(null,barItems.map(function(b){return Math.max(b.pct,100)}));
   var bhtml = '';
   barItems.forEach(function(b){
     var c = b.pct>=90?"#27AE60":b.pct>=70?"#F59E0B":"#EF4444";
     var w = Math.min(100,b.pct/maxPct*100);
     var mw = Math.min(100,100/maxPct*100);
+    var fullPct = b.meta>0 ? (b.metaFull/b.meta*100) : 100;
+    var fmw = hasFullMeta ? Math.min(100, fullPct/maxPct*100) : 0;
     bhtml += '<div style="margin-bottom:12px">';
     bhtml += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">';
     bhtml += '<span style="font-weight:600;font-size:13px;color:#374151">'+b.label+'</span>';
-    bhtml += '<span style="font-size:12px;color:#6b7280">'+b.fmt(b.real)+' / '+b.fmt(b.meta)+'</span>';
+    bhtml += '<span style="font-size:12px;color:#6b7280">'+b.fmt(b.real)+' / '+b.fmt(b.meta)+(hasFullMeta?' <span style="color:#bbb">/ '+b.fmt(b.metaFull)+'</span>':'')+'</span>';
     bhtml += '</div>';
     bhtml += '<div style="position:relative;height:28px;background:#F1F5F9;border-radius:8px;overflow:hidden">';
     bhtml += '<div style="position:absolute;left:0;top:0;height:100%;width:'+w+'%;background:'+c+';border-radius:8px;transition:width 0.5s ease;display:flex;align-items:center;justify-content:flex-end;padding-right:8px">';
     bhtml += '<span style="color:#fff;font-weight:700;font-size:12px;text-shadow:0 1px 2px rgba(0,0,0,0.3)">'+(b.pct>=8?Math.round(b.pct)+"%":"")+'</span>';
     bhtml += '</div>';
-    bhtml += '<div style="position:absolute;left:'+mw+'%;top:0;height:100%;width:2px;background:#3B82F6" title="Meta 100%"></div>';
+    bhtml += '<div style="position:absolute;left:'+mw+'%;top:0;height:100%;width:2px;background:#3B82F6" title="Meta proporcional"></div>';
+    if(hasFullMeta && fmw > 0) bhtml += '<div style="position:absolute;left:'+fmw+'%;top:0;height:100%;width:2px;background:#9CA3AF;border-left:1px dashed #6B7280" title="Meta mensal"></div>';
     bhtml += '</div>';
     bhtml += '</div>';
   });
@@ -562,7 +593,8 @@ function renderAll(){
   bhtml += '<span><span style="display:inline-block;width:10px;height:10px;background:#27AE60;border-radius:2px;margin-right:3px"></span>≥90%</span>';
   bhtml += '<span><span style="display:inline-block;width:10px;height:10px;background:#F59E0B;border-radius:2px;margin-right:3px"></span>70-89%</span>';
   bhtml += '<span><span style="display:inline-block;width:10px;height:10px;background:#EF4444;border-radius:2px;margin-right:3px"></span>&lt;70%</span>';
-  bhtml += '<span><span style="display:inline-block;width:10px;height:2px;background:#3B82F6;margin-right:3px;vertical-align:middle"></span>Meta</span>';
+  bhtml += '<span><span style="display:inline-block;width:10px;height:2px;background:#3B82F6;margin-right:3px;vertical-align:middle"></span>Meta periodo</span>';
+  if(hasFullMeta) bhtml += '<span><span style="display:inline-block;width:10px;height:2px;background:#9CA3AF;border-top:1px dashed #6B7280;margin-right:3px;vertical-align:middle"></span>Meta mensal</span>';
   bhtml += '</div>';
   document.getElementById("metaBarChart").innerHTML = bhtml;
 
