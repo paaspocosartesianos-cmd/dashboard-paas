@@ -29,6 +29,8 @@ jobs:
       - name: Fetch ads from Meta Ads API
         env:
           META_TOKEN: ${{ secrets.META_TOKEN }}
+          META_APP_ID: ${{ secrets.META_APP_ID }}
+          META_APP_SECRET: ${{ secrets.META_APP_SECRET }}
         run: python fetch_ads.py
         continue-on-error: true
 
