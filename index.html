@@ -924,9 +924,11 @@ function renderAll(){
   renderCharts(data);
 
   // Also update Trafego Pago tab if active
-  if(document.getElementById('tab-trafego') && document.getElementById('tab-trafego').classList.contains('active')){
-    renderAdsTab();
-  }
+  try{
+    if(document.getElementById('tab-trafego') && document.getElementById('tab-trafego').classList.contains('active')){
+      renderAdsTab();
+    }
+  }catch(e){ console.warn('renderAdsTab in renderAll error',e); }
 }
 
 function renderFilters(){
@@ -1638,6 +1640,8 @@ function preset(p){
     if(oc.indexOf("'"+p+"'") >= 0) b.classList.add("active");
   });
   renderAll();
+  // Always update Trafego Pago tab directly (renderAll may skip it on CRM errors)
+  try{ if(typeof renderAdsTab==='function' && ADS_DATA) renderAdsTab(); }catch(e){ console.warn('renderAdsTab error',e); }
 }
 
 function applyDates(){
@@ -1647,6 +1651,8 @@ function applyDates(){
   if(t) dtTo = new Date(t+"T12:00:00");
   document.querySelectorAll(".preset-btn").forEach(b=>b.classList.remove("active"));
   renderAll();
+  // Always update Trafego Pago tab directly (renderAll may skip it on CRM errors)
+  try{ if(typeof renderAdsTab==='function' && ADS_DATA) renderAdsTab(); }catch(e){ console.warn('renderAdsTab error',e); }
 }
 
 function setCF(f){
