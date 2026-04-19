@@ -86,7 +86,7 @@ canvas{max-height:280px}
 
 <div class="hdr">
   <div>
-    <h1>&#128202; ROAS & Funil por Servico / UTM</h1>
+    <h1>&#128202; ROAS &amp; Funil por Servico / UTM</h1>
     <div style="font-size:12px;opacity:.7;margin-top:3px">PAAS Pocos Artesianos &mdash; Meta Ads + Google Ads + CRM</div>
   </div>
   <div style="display:flex;gap:10px;align-items:center">
@@ -154,7 +154,7 @@ let DEALS=[],ADS={},GADS={},curSvc='TODOS',curPlat='TODOS',search='',curUtm='',c
 let pieChart=null,barChart=null;
 
 const SVC_KW={
-  'POCO':['poco','po&ccedil;o','well','artesian','litoral','artesiano'],
+  'POCO':['poco','po\u00e7o','well','artesian','litoral','artesiano'],
   'OUTORGA':['outorga','grant','licen'],
   'IRRIGACAO':['irriga','irrigation'],
   'FILTRO':['filtro','filter','filtr'],
@@ -167,8 +167,7 @@ const SVC_KW={
 function mSvc(text,svc){
   if(svc==='TODOS')return true;
   if(!text||typeof text!=='string')return false;
-  const t=text.toLowerCase();
-  return(SVC_KW[svc]||[svc.toLowerCase()]).some(k=>t.includes(k));
+  try{const t=text.toLowerCase();return(SVC_KW[svc]||[svc.toLowerCase()]).some(k=>t.includes(k));}catch(e){return false;}
 }
 function mSearch(text){
   if(!search)return true;
@@ -258,6 +257,7 @@ function getGoogleAds(){
   const filtered=camps.filter(c=>{
     return c.cost>0&&mSvc(c.campaign_name,curSvc)&&mSearch(c.campaign_name);
   });
+  // Pro-rata: Google Ads data is all-time totals, so scale by selected period
   const ratio=gadsDateRatio();
   if(ratio<1){
     return filtered.map(c=>({...c,
@@ -385,7 +385,7 @@ function render(){
     h+='</div>';
     h+='<div style="display:flex;height:28px;border-radius:6px;overflow:hidden;font-size:12px;font-weight:600;color:#fff">';
     if(metaSpend>0)h+='<div style="background:#1877f2;width:'+mPct+'%;display:flex;align-items:center;justify-content:center;min-width:60px" title="Meta Ads: '+fmt(metaSpend)+'">&#128216; Meta '+mPct+'%</div>';
-    if(gSpend>0)h+='<div style="background:#ea4335;width:'+gPct+'%;display:flex;align-items:center;justify-content:center;min-width:60px" title="Google Ads: '+fmt(gSpend)+'">&#128269; Google '+gPct+'%</div>';
+    if(gSpend>0)h+='<div style="background:#ea4335;width:'+gPct+'%;display:flex;align-items:center;justify-content:center;min-width:60px" title="Google Ads: '+fmt(gSpend)+(gEstimado?' (estimado)':'')+'">&#128269; Google '+gPct+'%</div>';
     h+='</div>';
     h+='<div style="display:flex;justify-content:space-between;margin-top:6px;font-size:11px;color:#6b7280">';
     h+='<span>&#128216; Meta: '+fmt(metaSpend)+' ('+fN(metaClicks)+' cliques)</span>';
@@ -396,7 +396,7 @@ function render(){
 
   // === KPIs ===
   h+='<div class="kpi-row">';
-  h+='<div class="kpi blue"><div class="lb">Investimento</div><div class="vl">'+fmt(adSpend)+'</div><div class="sb">'+platLabel+' no periodo'+(gEstimado?' (Google ~est.)':'')+' </div></div>';
+  h+='<div class="kpi blue"><div class="lb">Investimento</div><div class="vl">'+fmt(adSpend)+'</div><div class="sb">'+platLabel+' no periodo'+(gEstimado?' (Google ~est.)':'')+'</div></div>';
   h+='<div class="kpi"><div class="lb">Conversoes Ads</div><div class="vl">'+fN(adConversions)+'</div><div class="sb">'+fN(adLeads)+' leads + '+fN(adMsgs)+' msgs</div></div>';
   h+='<div class="kpi"><div class="lb">Oportunidades</div><div class="vl">'+fN(totalDeals)+'</div><div class="sb">'+fN(paidDeals.length)+' de trafego pago</div></div>';
   h+='<div class="kpi"><div class="lb">Vendas</div><div class="vl">'+fN(vendidas.length)+'</div><div class="sb">TxC: '+txC.toFixed(1)+'%</div></div>';
@@ -523,7 +523,7 @@ function render(){
     // CRM deals for this service
     const sDeals=DEALS.filter(d=>{
       if(!inPeriod(d.dc))return false;
-      return mSvc(d.c,svc)||mSvc(d.fo,svc)||mSvc(d.f,svc)||mSvc(d.n,svc);
+      return mSvc(d.c||'',svc)||mSvc(d.fo||'',svc)||mSvc(d.f||'',svc)||mSvc(d.n||'',svc);
     });
     const sVendas=sDeals.filter(d=>d.e==='Vendida');
     const sFat=sVendas.reduce((s,d)=>s+(d.v||0),0);
@@ -555,6 +555,11 @@ function render(){
     h+='<th>Campanha</th><th>Investimento</th><th>Cliques</th><th>Leads</th><th>Msgs</th><th>CPC</th><th>CPL</th><th>CTR</th><th>Alcance</th><th>Faturamento</th><th>ROAS</th>';
     h+='</tr></thead><tbody>';
     fa.sort((a,b)=>b.spend-a.spend).forEach(c=>{
+      const cKey=c.campaign_name.split(']')[1]?(c.campaign_name.split(']')[1].trim().substring(0,8).toLowerCase()):(c.campaign_name.substring(0,8).toLowerCase());
+      const cDeals=fd.filter(d=>(d.c||'').toLowerCase().includes(cKey));
+      const cVendas=cDeals.filter(d=>d.e==='Vendida');
+      const cFat=cVendas.reduce((s,d)=>s+(d.v||0),0);
+      const cRoas=c.spend>0?cFat/c.spend:0;
       h+='<tr>';
       h+='<td><strong>'+c.campaign_name+'</strong></td>';
       h+='<td>'+fmt(c.spend)+'</td>';
@@ -565,11 +570,6 @@ function render(){
       h+='<td>'+(c.cpl>0?fmt(c.cpl):'-')+'</td>';
       h+='<td>'+(c.ctr||0).toFixed(2)+'%</td>';
       h+='<td>'+fN(c.reach)+'</td>';
-      // Faturamento: match campaign name to deals UTM
-      const cDeals=fd.filter(d=>(d.c||'').toLowerCase().includes(c.campaign_name.split(']')[1]?(c.campaign_name.split(']')[1].trim().substring(0,8).toLowerCase()):(c.campaign_name.substring(0,8).toLowerCase())));
-      const cVendas=cDeals.filter(d=>d.e==='Vendida');
-      const cFat=cVendas.reduce((s,d)=>s+(d.v||0),0);
-      const cRoas=c.spend>0?cFat/c.spend:0;
       h+='<td style="font-weight:600;color:#16a34a">'+fmt(cFat)+'</td>';
       h+='<td style="font-weight:600;color:'+(cRoas>=3?'#16a34a':cRoas>=1?'#ea580c':'#dc2626')+'">'+cRoas.toFixed(1)+'x</td>';
       h+='</tr>';
@@ -587,6 +587,11 @@ function render(){
     fga.sort((a,b)=>b.cost-a.cost).forEach(c=>{
       const gcpc=c.clicks>0?(c.cost/c.clicks):0;
       const typeTag=c.campaign_type==='Performance Max'?'to':c.campaign_type==='Pesquisa'?'tb':'tg';
+      const gcn=c.campaign_name.replace(/\[.*?\]\s*/,'').substring(0,10).toLowerCase();
+      const gDeals=fd.filter(d=>{const t=((d.c||'')+' '+(d.fo||'')+' '+(d.n||'')).toLowerCase();return gcn.length>3&&t.includes(gcn.substring(0,6));});
+      const gVendas=gDeals.filter(d=>d.e==='Vendida');
+      const gFat=gVendas.reduce((s,d)=>s+(d.v||0),0);
+      const gCRoas=c.cost>0?gFat/c.cost:0;
       h+='<tr>';
       h+='<td><strong>'+c.campaign_name+'</strong></td>';
       h+='<td><span class="tag '+typeTag+'">'+c.campaign_type+'</span></td>';
@@ -596,15 +601,6 @@ function render(){
       h+='<td>'+fN(c.conversions)+'</td>';
       h+='<td>'+fmt(gcpc)+'</td>';
       h+='<td>'+(c.conv_rate||0).toFixed(1)+'%</td>';
-      // Faturamento: match Google campaign to deals
-      const gcn=c.campaign_name.replace(/\[.*?\]\s*/,'').substring(0,10).toLowerCase();
-      const gDeals=fd.filter(d=>{
-        const t=((d.c||'')+' '+(d.fo||'')+' '+(d.n||'')).toLowerCase();
-        return gcn.length>3&&t.includes(gcn.substring(0,6));
-      });
-      const gVendas=gDeals.filter(d=>d.e==='Vendida');
-      const gFat=gVendas.reduce((s,d)=>s+(d.v||0),0);
-      const gCRoas=c.cost>0?gFat/c.cost:0;
       h+='<td style="font-weight:600;color:#16a34a">'+fmt(gFat)+'</td>';
       h+='<td style="font-weight:600;color:'+(gCRoas>=3?'#16a34a':gCRoas>=1?'#ea580c':'#dc2626')+'">'+gCRoas.toFixed(1)+'x</td>';
       h+='</tr>';
