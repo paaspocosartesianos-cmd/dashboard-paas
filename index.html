@@ -182,6 +182,45 @@ body.dark .footer{color:#475569}
 body.dark .modal-close{color:#94a3b8}
 body.dark .modal-close:hover{background:#334155;color:#e2e8f0}
 body.dark .lc-btn-close{background:#334155;color:#e2e8f0}
+/* === TABS === */
+.tab-nav{display:flex;gap:0;margin-bottom:14px;background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.08);border:1px solid #e5e7eb}
+.tab-btn{flex:1;padding:12px 20px;font-size:14px;font-weight:600;border:none;cursor:pointer;background:#fff;color:#6b7280;transition:.2s;text-align:center;position:relative}
+.tab-btn:hover{background:#f3f4f6;color:#1f2937}
+.tab-btn.active{background:#065A82;color:#fff}
+.tab-btn .tab-icon{margin-right:6px;font-size:16px}
+.tab-content{display:none}
+.tab-content.active{display:block}
+body.dark .tab-nav{background:#1e293b;border-color:#334155}
+body.dark .tab-btn{background:#1e293b;color:#94a3b8}
+body.dark .tab-btn:hover{background:#334155;color:#e2e8f0}
+body.dark .tab-btn.active{background:#0c4a6e;color:#fff}
+/* === TRÁFEGO PAGO STYLES === */
+.ads-kpi-row{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:14px}
+.ads-kpi{background:#fff;border-radius:8px;padding:14px;box-shadow:0 1px 3px rgba(0,0,0,.08);border:1px solid #e5e7eb;text-align:center;border-top:3px solid #6366F1}
+.ads-kpi .lb{font-size:10px;color:#6b7280;margin-bottom:3px;text-transform:uppercase;letter-spacing:.5px}
+.ads-kpi .vl{font-size:20px;font-weight:700;color:#1f2937}
+.ads-kpi .sb{font-size:10px;margin-top:3px}
+.ads-kpi .delta{font-size:10px;font-weight:600;margin-top:2px}
+.delta.up{color:#27AE60}
+.delta.down{color:#E74C3C}
+.delta.neutral{color:#6b7280}
+.camp-type{display:inline-block;padding:2px 8px;border-radius:4px;font-size:9px;font-weight:600;letter-spacing:.3px}
+.camp-cadastro{background:#DBEAFE;color:#1E40AF}
+.camp-engajamento{background:#EDE9FE;color:#5B21B6}
+.camp-trafego{background:#D1FAE5;color:#065F46}
+.camp-lead{background:#FEF3C7;color:#92400E}
+.camp-remarketing{background:#FCE7F3;color:#9D174D}
+body.dark .ads-kpi{background:#1e293b;border-color:#334155;border-top-color:#6366F1}
+body.dark .ads-kpi .vl{color:#e2e8f0}
+body.dark .ads-kpi .lb{color:#94a3b8}
+body.dark .camp-cadastro{background:#1e3a5f;color:#93c5fd}
+body.dark .camp-engajamento{background:#2e1065;color:#c4b5fd}
+body.dark .camp-trafego{background:#064e3b;color:#6ee7b7}
+body.dark .camp-lead{background:#78350f;color:#fde68a}
+body.dark .camp-remarketing{background:#831843;color:#f9a8d4}
+@media(max-width:1000px){.ads-kpi-row{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:768px){.ads-kpi-row{grid-template-columns:repeat(2,1fr);gap:6px}.ads-kpi .vl{font-size:16px}.ads-kpi{padding:10px}}
+@media(max-width:480px){.ads-kpi-row{grid-template-columns:1fr 1fr;gap:4px}.ads-kpi{padding:8px}.ads-kpi .vl{font-size:14px}}
 </style>
 </head>
 <body>
@@ -239,6 +278,14 @@ body.dark .lc-btn-close{background:#334155;color:#e2e8f0}
     </div>
   </div>
 
+  <!-- TAB NAVIGATION -->
+  <div class="tab-nav">
+    <button class="tab-btn active" onclick="switchTab('comercial')"><span class="tab-icon">📊</span>Comercial (CRM)</button>
+    <button class="tab-btn" onclick="switchTab('trafego')"><span class="tab-icon">📣</span>Trafego Pago (Meta Ads)</button>
+  </div>
+
+  <!-- TAB: COMERCIAL -->
+  <div class="tab-content active" id="tab-comercial">
   <div id="period-info" style="text-align:center;font-size:11px;color:#6b7280;margin-bottom:10px"></div>
   <div class="kpi-row" id="kpis"></div>
 
@@ -316,6 +363,40 @@ body.dark .lc-btn-close{background:#334155;color:#e2e8f0}
     <p class="st" style="color:#92400e">Vendas que nao tem fonte ou campanha preenchida — dinheiro sem rastreio de origem</p>
     <div class="scr"><table id="sfTable"></table></div>
   </div>
+
+  </div><!-- /tab-comercial -->
+
+  <!-- TAB: TRÁFEGO PAGO -->
+  <div class="tab-content" id="tab-trafego">
+    <div style="text-align:center;font-size:11px;color:#6b7280;margin-bottom:10px" id="ads-period-info"></div>
+    <div class="ads-kpi-row" id="ads-kpis"></div>
+
+    <div class="g2">
+      <div class="card"><h3>Investimento Diario (R$)</h3><canvas id="adsSpendChart"></canvas></div>
+      <div class="card"><h3>Conversoes Diarias (Leads + Mensagens)</h3><canvas id="adsConvChart"></canvas></div>
+    </div>
+
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px">
+        <h2>Performance por Campanha</h2>
+        <div class="fr" id="adsCampFilters"></div>
+      </div>
+      <div class="scr"><table id="adsCampTable"></table></div>
+    </div>
+
+    <div class="g2">
+      <div class="card"><h3>Distribuicao de Investimento</h3><canvas id="adsSpendPie"></canvas></div>
+      <div class="card"><h3>Custo por Conversao por Campanha</h3><canvas id="adsCPCBar"></canvas></div>
+    </div>
+
+    <div class="card">
+      <h2>Comparativo com Mes Anterior</h2>
+      <p class="st">Projecao baseada nos dias decorridos do mes atual</p>
+      <div id="adsCompare"></div>
+    </div>
+
+    <div class="footer">PAAS Pocos Artesianos — Dados de Trafego Pago via Meta Ads API | <span id="ads-last-update" style="color:#999"></span></div>
+  </div><!-- /tab-trafego -->
 
   <div class="lead-card-bg" id="leadCard" onclick="if(event.target===this)closeLeadCard()">
     <div class="lead-card">
@@ -1604,6 +1685,19 @@ async function loadData(){
         }
       }
     } catch(e){ console.warn("meta.json error:", e); }
+    // Load ads data
+    try {
+      const adsResp = await fetch("data/ads_data.json" + cacheBust);
+      if(adsResp.ok){
+        ADS_DATA = await adsResp.json();
+        console.log("Loaded ads data:", ADS_DATA.campaigns ? ADS_DATA.campaigns.length + " campaigns" : "no campaigns");
+        var adsUp = document.getElementById('ads-last-update');
+        if(adsUp && ADS_DATA.meta && ADS_DATA.meta.fetched_at){
+          var adt = new Date(ADS_DATA.meta.fetched_at);
+          adsUp.textContent = "Atualizado: " + adt.toLocaleString("pt-BR");
+        }
+      }
+    } catch(e){ console.warn("ads_data.json error:", e); }
   } catch(e){
     console.warn("Fetch failed:", e);
   }
@@ -1686,6 +1780,273 @@ async function exportPDF(){
   }
   btn.textContent = '📄 PDF';
   btn.disabled = false;
+}
+
+// ===== TAB SWITCHING =====
+function switchTab(tab){
+  document.querySelectorAll('.tab-btn').forEach(function(b){b.classList.remove('active')});
+  document.querySelectorAll('.tab-content').forEach(function(c){c.classList.remove('active')});
+  if(tab==='trafego'){
+    document.querySelectorAll('.tab-btn')[1].classList.add('active');
+    document.getElementById('tab-trafego').classList.add('active');
+    if(ADS_DATA) renderAdsTab();
+  } else {
+    document.querySelectorAll('.tab-btn')[0].classList.add('active');
+    document.getElementById('tab-comercial').classList.add('active');
+  }
+}
+
+// ===== META ADS DATA =====
+var ADS_DATA = null;
+var adsCharts = {};
+var adsCampFilter = 'all';
+
+function renderAdsTab(){
+  if(!ADS_DATA) return;
+  var k = ADS_DATA.kpis;
+  var kp = ADS_DATA.kpis_prev;
+  var camps = ADS_DATA.campaigns || [];
+  var daily = ADS_DATA.daily || [];
+
+  // Period info
+  var pi = document.getElementById('ads-period-info');
+  if(pi && ADS_DATA.meta) pi.innerHTML = 'Periodo: <b>'+ADS_DATA.meta.period+'</b> | Comparativo: '+ADS_DATA.meta.prev_period;
+
+  // Calculate deltas (prorated)
+  var daysInMonth = new Date(new Date().getFullYear(), new Date().getMonth()+1, 0).getDate();
+  var daysPassed = daily.length || new Date().getDate();
+  var projFactor = daysInMonth / Math.max(daysPassed, 1);
+
+  function deltaHTML(current, previous, invert){
+    if(!previous || previous===0) return '<span class="delta neutral">—</span>';
+    var projected = current * projFactor;
+    var pct = ((projected - previous) / previous * 100);
+    var cls = pct > 0 ? (invert ? 'down' : 'up') : (invert ? 'up' : 'down');
+    if(Math.abs(pct) < 2) cls = 'neutral';
+    var arrow = pct > 0 ? '▲' : '▼';
+    return '<span class="delta '+cls+'">'+arrow+' '+(pct>0?'+':'')+pct.toFixed(0)+'% proj.</span>';
+  }
+
+  // KPIs
+  var kpiHTML = '';
+  var kpiData = [
+    {lb:'Investimento', vl:'R$ '+Number(k.investimento||0).toLocaleString('pt-BR',{maximumFractionDigits:0}), sb:'Mes anterior: R$ '+Number(kp.investimento||0).toLocaleString('pt-BR',{maximumFractionDigits:0}), delta:deltaHTML(k.investimento,kp.investimento,true)},
+    {lb:'Leads', vl:k.leads||0, sb:'Mes anterior: '+(kp.leads||0), delta:deltaHTML(k.leads,kp.leads)},
+    {lb:'Mensagens WhatsApp', vl:k.mensagens||0, sb:'Mes anterior: '+(kp.mensagens||0), delta:deltaHTML(k.mensagens,kp.mensagens)},
+    {lb:'Conversoes Totais', vl:k.conversoes||0, sb:'Mes anterior: '+(kp.conversoes||0), delta:deltaHTML(k.conversoes,kp.conversoes)},
+    {lb:'CPL (Custo/Lead)', vl:'R$ '+Number(k.cpl||0).toFixed(2).replace('.',','), sb:'CTR: '+(k.ctr_medio||0).toFixed(2)+'%', delta:deltaHTML(k.cpl, kp.investimento/Math.max(kp.leads,1), true)},
+    {lb:'Custo/Conversao', vl:'R$ '+Number(k.custo_por_conversao||0).toFixed(2).replace('.',','), sb:'CPM: R$ '+(k.cpm_medio||0).toFixed(2), delta:deltaHTML(k.custo_por_conversao, kp.investimento/Math.max(kp.conversoes,1), true)}
+  ];
+  kpiData.forEach(function(d){
+    kpiHTML += '<div class="ads-kpi"><div class="lb">'+d.lb+'</div><div class="vl">'+d.vl+'</div><div class="sb">'+d.sb+'</div>'+d.delta+'</div>';
+  });
+  document.getElementById('ads-kpis').innerHTML = kpiHTML;
+
+  // Campaign type filters
+  var types = {};
+  camps.forEach(function(c){
+    var t = getCampType(c.campaign_name);
+    types[t] = (types[t]||0) + 1;
+  });
+  var filterHTML = '<button class="fb '+(adsCampFilter==='all'?'act':'')+'" onclick="filterAdsCamp(\'all\')">Todas ('+camps.length+')</button>';
+  Object.keys(types).sort().forEach(function(t){
+    filterHTML += '<button class="fb '+(adsCampFilter===t?'act':'')+'" onclick="filterAdsCamp(\''+t+'\')">'+t+' ('+types[t]+')</button>';
+  });
+  document.getElementById('adsCampFilters').innerHTML = filterHTML;
+
+  // Campaign table
+  var filtered = adsCampFilter==='all' ? camps : camps.filter(function(c){return getCampType(c.campaign_name)===adsCampFilter});
+  var tHTML = '<thead><tr><th style="text-align:left">Campanha</th><th>Tipo</th><th>Invest.</th><th>Impr.</th><th>Cliques</th><th>CTR</th><th>CPC</th><th>CPM</th><th>Leads</th><th>Msgs</th><th>Conv.</th><th>Custo/Conv.</th><th>LP Views</th></tr></thead><tbody>';
+  var totS=0,totI=0,totCl=0,totL=0,totM=0,totLPV=0;
+  filtered.forEach(function(c){
+    var conv = (c.leads||0) + (c.messages||0);
+    var cconv = conv > 0 ? (c.spend/conv) : 0;
+    var tp = getCampType(c.campaign_name);
+    var tpCls = 'camp-'+tp.toLowerCase().replace(/[^a-z]/g,'');
+    totS+=c.spend; totI+=c.impressions; totCl+=c.clicks; totL+=c.leads||0; totM+=c.messages||0; totLPV+=c.landing_page_views||0;
+    tHTML += '<tr>';
+    tHTML += '<td style="max-width:250px;overflow:hidden;text-overflow:ellipsis" title="'+c.campaign_name+'">'+c.campaign_name+'</td>';
+    tHTML += '<td><span class="camp-type '+tpCls+'">'+tp+'</span></td>';
+    tHTML += '<td>R$ '+c.spend.toLocaleString('pt-BR',{maximumFractionDigits:0})+'</td>';
+    tHTML += '<td>'+c.impressions.toLocaleString('pt-BR')+'</td>';
+    tHTML += '<td>'+c.clicks.toLocaleString('pt-BR')+'</td>';
+    tHTML += '<td>'+(c.ctr||0).toFixed(2)+'%</td>';
+    tHTML += '<td>R$ '+(c.cpc||0).toFixed(2)+'</td>';
+    tHTML += '<td>R$ '+(c.cpm||0).toFixed(2)+'</td>';
+    tHTML += '<td style="font-weight:700;color:#2563eb">'+(c.leads||0)+'</td>';
+    tHTML += '<td style="font-weight:700;color:#25D366">'+(c.messages||0)+'</td>';
+    tHTML += '<td style="font-weight:700">'+conv+'</td>';
+    tHTML += '<td>R$ '+cconv.toFixed(2)+'</td>';
+    tHTML += '<td>'+(c.landing_page_views||0)+'</td>';
+    tHTML += '</tr>';
+  });
+  var totConv = totL+totM;
+  tHTML += '<tr style="font-weight:700;background:#f0f7ff!important"><td>TOTAL</td><td></td>';
+  tHTML += '<td>R$ '+totS.toLocaleString('pt-BR',{maximumFractionDigits:0})+'</td>';
+  tHTML += '<td>'+totI.toLocaleString('pt-BR')+'</td>';
+  tHTML += '<td>'+totCl.toLocaleString('pt-BR')+'</td>';
+  tHTML += '<td>'+(totI>0?(totCl/totI*100).toFixed(2):0)+'%</td>';
+  tHTML += '<td>R$ '+(totCl>0?(totS/totCl).toFixed(2):0)+'</td>';
+  tHTML += '<td>R$ '+(totI>0?(totS/totI*1000).toFixed(2):0)+'</td>';
+  tHTML += '<td style="color:#2563eb">'+totL+'</td>';
+  tHTML += '<td style="color:#25D366">'+totM+'</td>';
+  tHTML += '<td>'+totConv+'</td>';
+  tHTML += '<td>R$ '+(totConv>0?(totS/totConv).toFixed(2):0)+'</td>';
+  tHTML += '<td>'+totLPV+'</td></tr>';
+  tHTML += '</tbody>';
+  document.getElementById('adsCampTable').innerHTML = tHTML;
+
+  // Daily spend chart
+  renderAdsChart('adsSpendChart', 'line', {
+    labels: daily.map(function(d){return d.date.substring(5)}),
+    datasets: [{
+      label: 'Investimento (R$)',
+      data: daily.map(function(d){return d.spend}),
+      borderColor: '#6366F1',
+      backgroundColor: 'rgba(99,102,241,.1)',
+      fill: true,
+      tension: 0.3,
+      pointRadius: 3,
+      pointBackgroundColor: '#6366F1'
+    }]
+  }, {tooltips:true, yPrefix:'R$ '});
+
+  // Daily conversions chart
+  renderAdsChart('adsConvChart', 'bar', {
+    labels: daily.map(function(d){return d.date.substring(5)}),
+    datasets: [{
+      label: 'Leads',
+      data: daily.map(function(d){return d.leads||0}),
+      backgroundColor: '#3B82F6',
+      borderRadius: 4
+    },{
+      label: 'Mensagens',
+      data: daily.map(function(d){return d.messages||0}),
+      backgroundColor: '#25D366',
+      borderRadius: 4
+    }]
+  }, {stacked:true});
+
+  // Spend pie chart
+  var pieData = filtered.filter(function(c){return c.spend>0}).slice(0,8);
+  var colors = ['#6366F1','#3B82F6','#10B981','#F59E0B','#EF4444','#8B5CF6','#EC4899','#14B8A6'];
+  renderAdsChart('adsSpendPie', 'doughnut', {
+    labels: pieData.map(function(c){return c.campaign_name.replace(/\[.*?\]\s*/,'')}),
+    datasets: [{
+      data: pieData.map(function(c){return c.spend}),
+      backgroundColor: colors.slice(0, pieData.length),
+      borderWidth: 2,
+      borderColor: document.body.classList.contains('dark') ? '#1e293b' : '#fff'
+    }]
+  }, {legend:true});
+
+  // Cost per conversion bar chart
+  var convCamps = filtered.filter(function(c){return (c.leads||0)+(c.messages||0)>0});
+  convCamps.sort(function(a,b){
+    var ca = a.spend/((a.leads||0)+(a.messages||0));
+    var cb = b.spend/((b.leads||0)+(b.messages||0));
+    return ca - cb;
+  });
+  renderAdsChart('adsCPCBar', 'bar', {
+    labels: convCamps.map(function(c){return c.campaign_name.replace(/\[.*?\]\s*/,'').substring(0,20)}),
+    datasets: [{
+      label: 'Custo/Conversao (R$)',
+      data: convCamps.map(function(c){return c.spend/((c.leads||0)+(c.messages||0))}),
+      backgroundColor: convCamps.map(function(c){
+        var cost = c.spend/((c.leads||0)+(c.messages||0));
+        return cost < 40 ? '#10B981' : cost < 80 ? '#F59E0B' : '#EF4444';
+      }),
+      borderRadius: 4
+    }]
+  }, {horizontal:true, yPrefix:'R$ '});
+
+  // Comparison with previous month
+  renderAdsCompare(k, kp, projFactor);
+}
+
+function getCampType(name){
+  var n = (name||'').toUpperCase();
+  if(n.includes('[CADASTRO]')) return 'Cadastro';
+  if(n.includes('[ENGAJAMENTO]')) return 'Engajamento';
+  if(n.includes('[TRAFEGO]')||n.includes('[TRÁFEGO]')) return 'Trafego';
+  if(n.includes('[LEAD]')) return 'Lead';
+  if(n.includes('[REMARKETING]')) return 'Remarketing';
+  return 'Outro';
+}
+
+function filterAdsCamp(type){
+  adsCampFilter = type;
+  renderAdsTab();
+}
+
+function renderAdsChart(canvasId, type, data, opts){
+  if(adsCharts[canvasId]){adsCharts[canvasId].destroy()}
+  var ctx = document.getElementById(canvasId);
+  if(!ctx) return;
+  var isDark = document.body.classList.contains('dark');
+  var txtC = isDark ? '#94a3b8' : '#6b7280';
+  var gridC = isDark ? 'rgba(148,163,184,.15)' : 'rgba(0,0,0,.06)';
+
+  var config = {type:type, data:data, options:{
+    responsive:true,
+    maintainAspectRatio:true,
+    plugins:{
+      legend:{display:!!(opts&&opts.legend), labels:{color:txtC, font:{size:11}}},
+      tooltip:{callbacks:{}}
+    }
+  }};
+
+  if(opts && opts.yPrefix){
+    config.options.plugins.tooltip.callbacks.label = function(ctx){
+      return ctx.dataset.label + ': ' + opts.yPrefix + Number(ctx.raw||0).toLocaleString('pt-BR',{maximumFractionDigits:2});
+    };
+  }
+
+  if(type !== 'doughnut' && type !== 'pie'){
+    var indexAxis = (opts && opts.horizontal) ? 'y' : 'x';
+    config.options.indexAxis = indexAxis;
+    config.options.scales = {
+      x:{ticks:{color:txtC,font:{size:10}},grid:{color:gridC}},
+      y:{ticks:{color:txtC,font:{size:10}},grid:{color:gridC}}
+    };
+    if(opts && opts.stacked){
+      config.options.scales.x.stacked = true;
+      config.options.scales.y.stacked = true;
+    }
+  }
+
+  adsCharts[canvasId] = new Chart(ctx, config);
+}
+
+function renderAdsCompare(k, kp, projFactor){
+  var el = document.getElementById('adsCompare');
+  if(!el) return;
+  var metrics = [
+    {name:'Investimento', cur:k.investimento, prev:kp.investimento, prefix:'R$ ', invert:true},
+    {name:'Leads', cur:k.leads, prev:kp.leads, prefix:''},
+    {name:'Mensagens', cur:k.mensagens, prev:kp.mensagens, prefix:''},
+    {name:'Conversoes', cur:k.conversoes, prev:kp.conversoes, prefix:''},
+    {name:'Cliques', cur:k.cliques||0, prev:kp.cliques||0, prefix:''}
+  ];
+  var html = '<div class="g4" style="margin-top:10px">';
+  metrics.forEach(function(m){
+    var projected = m.cur * projFactor;
+    var pct = m.prev > 0 ? ((projected - m.prev) / m.prev * 100) : 0;
+    var cls = pct > 0 ? (m.invert ? 'down' : 'up') : (m.invert ? 'up' : 'down');
+    if(Math.abs(pct) < 2) cls = 'neutral';
+    var arrow = pct > 0 ? '▲' : '▼';
+    html += '<div class="ads-kpi">';
+    html += '<div class="lb">'+m.name+'</div>';
+    html += '<div style="display:flex;justify-content:space-around;margin-top:8px">';
+    html += '<div><div style="font-size:9px;color:#6b7280">Atual</div><div style="font-size:16px;font-weight:700">'+m.prefix+Number(m.cur||0).toLocaleString('pt-BR',{maximumFractionDigits:0})+'</div></div>';
+    html += '<div><div style="font-size:9px;color:#6b7280">Projecao</div><div style="font-size:16px;font-weight:700;color:#6366F1">'+m.prefix+Number(projected||0).toLocaleString('pt-BR',{maximumFractionDigits:0})+'</div></div>';
+    html += '<div><div style="font-size:9px;color:#6b7280">Mes Ant.</div><div style="font-size:16px;font-weight:700">'+m.prefix+Number(m.prev||0).toLocaleString('pt-BR',{maximumFractionDigits:0})+'</div></div>';
+    html += '</div>';
+    html += '<div class="delta '+cls+'" style="margin-top:6px">'+arrow+' '+(pct>0?'+':'')+pct.toFixed(0)+'% vs mes anterior</div>';
+    html += '</div>';
+  });
+  html += '</div>';
+  el.innerHTML = html;
 }
 
 function initDashboard(){
