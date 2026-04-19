@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ROAS & Funil — PAAS Dashboard</title>
+<title>ROAS & Funil â PAAS Dashboard</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:-apple-system,system-ui,'Segoe UI',Roboto,sans-serif;background:#f3f4f6;color:#1e293b;font-size:15px}
@@ -86,12 +86,12 @@ canvas{max-height:280px}
 
 <div class="hdr">
   <div>
-    <h1>📊 ROAS & Funil por Servico / UTM</h1>
-    <div style="font-size:12px;opacity:.7;margin-top:3px">PAAS Pocos Artesianos — Meta Ads + CRM</div>
+    <h1>ð ROAS & Funil por Servico / UTM</h1>
+    <div style="font-size:12px;opacity:.7;margin-top:3px">PAAS Pocos Artesianos â Meta Ads + Google Ads + CRM</div>
   </div>
   <div style="display:flex;gap:10px;align-items:center">
-    <a href="index.html" class="nav-link">← Dashboard Principal</a>
-    <button onclick="document.documentElement.classList.toggle('dark')" style="background:none;border:1px solid rgba(255,255,255,.4);color:#fff;padding:5px 10px;border-radius:5px;cursor:pointer;font-size:12px">🌙</button>
+    <a href="index.html" class="nav-link">â Dashboard Principal</a>
+    <button onclick="document.documentElement.classList.toggle('dark')" style="background:none;border:1px solid rgba(255,255,255,.4);color:#fff;padding:5px 10px;border-radius:5px;cursor:pointer;font-size:12px">ð</button>
   </div>
 </div>
 
@@ -111,7 +111,13 @@ canvas{max-height:280px}
 </div>
 
 <div class="filter-row">
-  <label>UTM / Campanha:</label>
+  <label>Plataforma:</label>
+  <div class="btn-group" id="platBtns">
+    <button class="btn-svc active" data-plat="TODOS" style="font-size:11px">ð Todos</button>
+    <button class="btn-svc" data-plat="META" style="font-size:11px">ð Meta</button>
+    <button class="btn-svc" data-plat="GOOGLE" style="font-size:11px">ð Google</button>
+  </div>
+  <label style="margin-left:16px">UTM / Campanha:</label>
   <select id="utmFilter">
     <option value="">Todas as UTMs</option>
   </select>
@@ -138,17 +144,17 @@ canvas{max-height:280px}
 </div>
 
 <div class="ct" id="content">
-  <div class="loading">Carregando dados do CRM e Meta Ads...</div>
+  <div class="loading">Carregando dados do CRM, Meta Ads e Google Ads...</div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
 <script>
 const BASE='https://paaspocosartesianos-cmd.github.io/dashboard-paas/data/';
-let DEALS=[],ADS={},curSvc='TODOS',search='',curUtm='',curFonte='',dtStart=null,dtEnd=null;
+let DEALS=[],ADS={},GADS={},curSvc='TODOS',curPlat='TODOS',search='',curUtm='',curFonte='',dtStart=null,dtEnd=null;
 let pieChart=null,barChart=null;
 
 const SVC_KW={
-  'POCO':['poco','poço','well','artesian','litoral','artesiano'],
+  'POCO':['poco','poÃ§o','well','artesian','litoral','artesiano'],
   'OUTORGA':['outorga','grant','licen'],
   'IRRIGACAO':['irriga','irrigation'],
   'FILTRO':['filtro','filter','filtr'],
@@ -174,11 +180,12 @@ function parseD(s){if(!s)return null;if(s.includes('T'))return new Date(s);const
 
 async function loadData(){
   try{
-    const[dr,ar]=await Promise.all([
+    const[dr,ar,gr]=await Promise.all([
       fetch(BASE+'deals.json').then(r=>r.json()),
-      fetch(BASE+'ads_data.json').then(r=>r.json())
+      fetch(BASE+'ads_data.json').then(r=>r.json()).catch(()=>({})),
+      fetch(BASE+'google_ads_data.json').then(r=>r.json()).catch(()=>({campaigns:[],totals:{}}))
     ]);
-    DEALS=dr;ADS=ar;
+    DEALS=dr;ADS=ar;GADS=gr;
     // Set default period: 1 year ago
     const now=new Date();
     dtEnd=new Date(now);
@@ -237,13 +244,23 @@ function getDeals(){
 }
 
 function getAds(){
+  if(curPlat==='GOOGLE')return[];
   const camps=ADS.campaigns||[];
   return camps.filter(c=>{
     return mSvc(c.campaign_name,curSvc)&&mSearch(c.campaign_name);
   });
 }
 
+function getGoogleAds(){
+  if(curPlat==='META')return[];
+  const camps=GADS.campaigns||[];
+  return camps.filter(c=>{
+    return c.cost>0&&mSvc(c.campaign_name,curSvc)&&mSearch(c.campaign_name);
+  });
+}
+
 function getAdsDaily(){
+  if(curPlat==='GOOGLE')return[];
   const daily=ADS.campaign_daily||[];
   return daily.filter(d=>{
     if(!mSvc(d.campaign_name,curSvc))return false;
@@ -260,19 +277,39 @@ function render(){
   const fd=getDeals();
   const fa=getAds();
   const fad=getAdsDaily();
+  const fga=getGoogleAds();
 
-  // === ADS METRICS (from daily for period accuracy) ===
-  const adSpend=fad.reduce((s,d)=>s+(d.spend||0),0);
-  const adClicks=fad.reduce((s,d)=>s+(d.clicks||0),0);
-  const adImpressions=fad.reduce((s,d)=>s+(d.impressions||0),0);
-  const adLeads=fad.reduce((s,d)=>s+(d.leads||0),0);
-  const adMsgs=fad.reduce((s,d)=>s+(d.messages||0),0);
-  const adLPV=fad.reduce((s,d)=>s+(d.landing_page_views||0),0);
-  const adLinkClicks=fad.reduce((s,d)=>s+(d.link_clicks||0),0);
-  const adReach=fad.reduce((s,d)=>s+(d.reach||0),0);
-  const adConversions=adLeads+adMsgs;
+  // === META ADS METRICS (from daily for period accuracy) ===
+  const metaSpend=fad.reduce((s,d)=>s+(d.spend||0),0);
+  const metaClicks=fad.reduce((s,d)=>s+(d.clicks||0),0);
+  const metaImpressions=fad.reduce((s,d)=>s+(d.impressions||0),0);
+  const metaLeads=fad.reduce((s,d)=>s+(d.leads||0),0);
+  const metaMsgs=fad.reduce((s,d)=>s+(d.messages||0),0);
+  const metaLPV=fad.reduce((s,d)=>s+(d.landing_page_views||0),0);
+  const metaLinkClicks=fad.reduce((s,d)=>s+(d.link_clicks||0),0);
+  const metaReach=fad.reduce((s,d)=>s+(d.reach||0),0);
+
+  // === GOOGLE ADS METRICS (from campaign totals) ===
+  const gSpend=fga.reduce((s,c)=>s+(c.cost||0),0);
+  const gClicks=fga.reduce((s,c)=>s+(c.clicks||0),0);
+  const gImpressions=fga.reduce((s,c)=>s+(c.impressions||0),0);
+  const gConversions=fga.reduce((s,c)=>s+(c.conversions||0),0);
+
+  // === COMBINED METRICS ===
+  const adSpend=metaSpend+gSpend;
+  const adClicks=metaClicks+gClicks;
+  const adImpressions=metaImpressions+gImpressions;
+  const adLeads=metaLeads;
+  const adMsgs=metaMsgs;
+  const adLPV=metaLPV;
+  const adLinkClicks=metaLinkClicks;
+  const adReach=metaReach;
+  const adConversions=metaLeads+metaMsgs+gConversions;
   const cpc=adClicks>0?adSpend/adClicks:0;
   const cpl=adConversions>0?adSpend/adConversions:0;
+
+  // Platform label
+  const platLabel=curPlat==='META'?'Meta Ads':curPlat==='GOOGLE'?'Google Ads':'Meta + Google Ads';
 
   // === CRM METRICS ===
   const totalDeals=fd.length;
@@ -304,16 +341,34 @@ function render(){
   if(curUtm)filters.push('UTM: '+curUtm);
   if(curFonte)filters.push('Fonte: '+curFonte);
   if(search)filters.push('Busca: "'+search+'"');
+  if(curPlat!=='TODOS')filters.push('Plataforma: '+platLabel);
   if(filters.length>0){
     h+='<div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:10px 16px;margin-bottom:16px;font-size:13px;color:#1e40af">';
     h+='<strong>Filtros ativos:</strong> '+filters.join(' | ');
-    h+=' — <strong>'+fN(totalDeals)+'</strong> deals encontrados';
+    h+=' â <strong>'+fN(totalDeals)+'</strong> deals encontrados';
     h+='</div>';
+  }
+
+  // === PLATFORM BREAKDOWN BAR ===
+  if(curPlat==='TODOS'&&(metaSpend>0||gSpend>0)){
+    const mPct=adSpend>0?(metaSpend/adSpend*100).toFixed(0):0;
+    const gPct=adSpend>0?(gSpend/adSpend*100).toFixed(0):0;
+    h+='<div style="background:#fff;border-radius:10px;padding:14px 18px;margin-bottom:16px;box-shadow:0 1px 3px rgba(0,0,0,.06)">';
+    h+='<div style="font-size:12px;font-weight:600;color:#6b7280;margin-bottom:8px">INVESTIMENTO POR PLATAFORMA</div>';
+    h+='<div style="display:flex;height:28px;border-radius:6px;overflow:hidden;font-size:12px;font-weight:600;color:#fff">';
+    if(metaSpend>0)h+='<div style="background:#1877f2;width:'+mPct+'%;display:flex;align-items:center;justify-content:center;min-width:60px" title="Meta Ads: '+fmt(metaSpend)+'">ð Meta '+mPct+'%</div>';
+    if(gSpend>0)h+='<div style="background:#ea4335;width:'+gPct+'%;display:flex;align-items:center;justify-content:center;min-width:60px" title="Google Ads: '+fmt(gSpend)+'">ð Google '+gPct+'%</div>';
+    h+='</div>';
+    h+='<div style="display:flex;justify-content:space-between;margin-top:6px;font-size:11px;color:#6b7280">';
+    h+='<span>ð Meta: '+fmt(metaSpend)+' ('+fN(metaClicks)+' cliques)</span>';
+    h+='<span>ð Google: '+fmt(gSpend)+' ('+fN(gClicks)+' cliques)</span>';
+    h+='<span><strong>Total: '+fmt(adSpend)+'</strong></span>';
+    h+='</div></div>';
   }
 
   // === KPIs ===
   h+='<div class="kpi-row">';
-  h+='<div class="kpi blue"><div class="lb">Investimento</div><div class="vl">'+fmt(adSpend)+'</div><div class="sb">Meta Ads no periodo</div></div>';
+  h+='<div class="kpi blue"><div class="lb">Investimento</div><div class="vl">'+fmt(adSpend)+'</div><div class="sb">'+platLabel+' no periodo</div></div>';
   h+='<div class="kpi"><div class="lb">Conversoes Ads</div><div class="vl">'+fN(adConversions)+'</div><div class="sb">'+fN(adLeads)+' leads + '+fN(adMsgs)+' msgs</div></div>';
   h+='<div class="kpi"><div class="lb">Oportunidades</div><div class="vl">'+fN(totalDeals)+'</div><div class="sb">'+fN(paidDeals.length)+' de trafego pago</div></div>';
   h+='<div class="kpi"><div class="lb">Vendas</div><div class="vl">'+fN(vendidas.length)+'</div><div class="sb">TxC: '+txC.toFixed(1)+'%</div></div>';
@@ -334,10 +389,10 @@ function render(){
     {l:'Leads/Msgs (Ads)',v:fN(adConversions),c:'#0d9488',w:adClicks>0?Math.max(12,adConversions/adClicks*90):65,x:'CPL: '+fmt(cpl)},
     {l:'Oportunidades (CRM)',v:fN(totalDeals),c:'#059669',w:55,x:paidDeals.length+' de trafego pago ('+pct(paidDeals.length,totalDeals)+')'},
     {l:'Responderam (MQL)',v:fN(pastSC),c:'#16a34a',w:totalDeals>0?Math.max(10,pastSC/totalDeals*55):45,x:pct(pastSC,totalDeals)+' taxa atendimento'},
-    {l:'Vendas',v:fN(vendidas.length),c:'#ca8a04',w:totalDeals>0?Math.max(8,vendidas.length/totalDeals*55):18,x:'TxC Leads→Vendas: '+pct(vendidas.length,totalDeals)},
+    {l:'Vendas',v:fN(vendidas.length),c:'#ca8a04',w:totalDeals>0?Math.max(8,vendidas.length/totalDeals*55):18,x:'TxC LeadsâVendas: '+pct(vendidas.length,totalDeals)},
     {l:'Faturamento',v:fmt(fat),c:'#ea580c',w:30,x:'Ticket: '+fmt(ticket)+' | ROAS: '+roas.toFixed(1)+'x'},
   ];
-  h+='<div class="sec"><h2>⬇️ Funil Completo</h2><div class="funnel">';
+  h+='<div class="sec"><h2>â¬ï¸ Funil Completo</h2><div class="funnel">';
   steps.forEach(s=>{
     h+='<div class="f-step">';
     h+='<div class="f-bar" style="width:'+s.w+'%;background:'+s.c+'">'+s.v+'</div>';
@@ -347,7 +402,7 @@ function render(){
   h+='</div></div>';
 
   // Pie
-  h+='<div class="sec"><h2>📊 Status dos Deals</h2>';
+  h+='<div class="sec"><h2>ð Status dos Deals</h2>';
   h+='<canvas id="pieC"></canvas>';
   h+='<div style="margin-top:10px;font-size:12px;color:#6b7280;display:flex;gap:8px;flex-wrap:wrap">';
   h+='<span class="tag tg">Vendidas: '+vendidas.length+'</span>';
@@ -357,7 +412,7 @@ function render(){
   h+='</div>'; // grid-2
 
   // === PIPELINE STAGES ===
-  h+='<div class="sec"><h2>🔄 Pipeline — Etapas</h2>';
+  h+='<div class="sec"><h2>ð Pipeline â Etapas</h2>';
   const etapaEntries=Object.entries(etapas).sort((a,b)=>b[1]-a[1]);
   if(etapaEntries.length>0){
     h+='<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">';
@@ -375,7 +430,7 @@ function render(){
   h+='</div>';
 
   // === ROAS POR UTM/CAMPANHA TABLE ===
-  h+='<div class="sec"><h2>📈 ROAS por UTM / Campanha</h2>';
+  h+='<div class="sec"><h2>ð ROAS por UTM / Campanha</h2>';
   const campBk={};
   fd.forEach(d=>{
     const utm=d.c?d.c.trim():'';
@@ -415,20 +470,28 @@ function render(){
   h+='</div>';
 
   // === ROAS POR SERVICO (summary table) ===
-  h+='<div class="sec"><h2>🏆 ROAS Comparativo por Servico</h2>';
+  h+='<div class="sec"><h2>ð ROAS Comparativo por Servico</h2>';
   h+='<div style="overflow-x:auto"><table><thead><tr>';
   h+='<th>Servico</th><th>Investimento</th><th>Leads CRM</th><th>Vendas</th><th>TxC</th><th>Faturamento</th><th>ROAS</th><th>CAC</th><th>Ticket</th>';
   h+='</tr></thead><tbody>';
   const svcs=['POCO','OUTORGA','IRRIGACAO','FILTRO','HIDRO','SONDAGEM','MONITORAMENTO','WHATSAPP'];
   const svcNames={'POCO':'Poco Artesiano','OUTORGA':'Outorga','IRRIGACAO':'Irrigacao','FILTRO':'Filtro','HIDRO':'HidroPAAS','SONDAGEM':'Sondagem SPT','MONITORAMENTO':'Monitoramento','WHATSAPP':'WhatsApp'};
   svcs.forEach(svc=>{
-    // Ads spend for this service
-    const sAds=(ADS.campaign_daily||[]).filter(d=>{
-      if(!mSvc(d.campaign_name,svc))return false;
-      if(dtStart&&dtEnd){const dd=parseD(d.date);if(dd&&(dd<dtStart||dd>dtEnd))return false}
-      return true;
-    });
-    const sSpend=sAds.reduce((s,d)=>s+(d.spend||0),0);
+    // Meta Ads spend for this service
+    let sSpend=0;
+    if(curPlat!=='GOOGLE'){
+      const sAds=(ADS.campaign_daily||[]).filter(d=>{
+        if(!mSvc(d.campaign_name,svc))return false;
+        if(dtStart&&dtEnd){const dd=parseD(d.date);if(dd&&(dd<dtStart||dd>dtEnd))return false}
+        return true;
+      });
+      sSpend+=sAds.reduce((s,d)=>s+(d.spend||0),0);
+    }
+    // Google Ads spend for this service
+    if(curPlat!=='META'){
+      const sGads=(GADS.campaigns||[]).filter(c=>c.cost>0&&mSvc(c.campaign_name,svc));
+      sSpend+=sGads.reduce((s,c)=>s+(c.cost||0),0);
+    }
     // CRM deals for this service
     const sDeals=DEALS.filter(d=>{
       if(!inPeriod(d.dc))return false;
@@ -459,7 +522,7 @@ function render(){
 
   // === META ADS CAMPAIGNS DETAIL ===
   if(fa.length>0){
-    h+='<div class="sec"><h2>📣 Campanhas Meta Ads — Detalhes</h2>';
+    h+='<div class="sec"><h2>ð£ Campanhas Meta Ads â Detalhes</h2>';
     h+='<div style="overflow-x:auto"><table><thead><tr>';
     h+='<th>Campanha</th><th>Investimento</th><th>Cliques</th><th>Leads</th><th>Msgs</th><th>CPC</th><th>CPL</th><th>CTR</th><th>Alcance</th>';
     h+='</tr></thead><tbody>';
@@ -479,8 +542,32 @@ function render(){
     h+='</tbody></table></div></div>';
   }
 
+  // === GOOGLE ADS CAMPAIGNS DETAIL ===
+  if(fga.length>0){
+    h+='<div class="sec"><h2>ð Campanhas Google Ads â Detalhes</h2>';
+    h+='<div style="margin-bottom:10px;font-size:12px;color:#6b7280">'+fga.length+' campanhas | Investimento total: '+fmt(gSpend)+' | '+fN(gClicks)+' cliques | '+fN(gConversions)+' conversoes</div>';
+    h+='<div style="overflow-x:auto"><table><thead><tr>';
+    h+='<th>Campanha</th><th>Tipo</th><th>Investimento</th><th>Cliques</th><th>Impr.</th><th>Conv.</th><th>CPC</th><th>Taxa Conv.</th>';
+    h+='</tr></thead><tbody>';
+    fga.sort((a,b)=>b.cost-a.cost).forEach(c=>{
+      const gcpc=c.clicks>0?(c.cost/c.clicks):0;
+      const typeTag=c.campaign_type==='Performance Max'?'to':c.campaign_type==='Pesquisa'?'tb':'tg';
+      h+='<tr>';
+      h+='<td><strong>'+c.campaign_name+'</strong></td>';
+      h+='<td><span class="tag '+typeTag+'">'+c.campaign_type+'</span></td>';
+      h+='<td>'+fmt(c.cost)+'</td>';
+      h+='<td>'+fN(c.clicks)+'</td>';
+      h+='<td>'+fN(c.impressions)+'</td>';
+      h+='<td>'+fN(c.conversions)+'</td>';
+      h+='<td>'+fmt(gcpc)+'</td>';
+      h+='<td>'+(c.conv_rate||0).toFixed(1)+'%</td>';
+      h+='</tr>';
+    });
+    h+='</tbody></table></div></div>';
+  }
+
   // === EVOLUCAO DIARIA (bar chart) ===
-  h+='<div class="sec"><h2>📅 Evolucao Mensal — Investimento vs Faturamento</h2>';
+  h+='<div class="sec"><h2>ð Evolucao Mensal â Investimento vs Faturamento</h2>';
   h+='<canvas id="barC" style="max-height:320px"></canvas>';
   h+='</div>';
 
@@ -500,7 +587,7 @@ function render(){
     }
     // Bar - monthly evolution
     const bc=document.getElementById('barC');
-   if(bc){
+    if(bc){
       if(barChart)barChart.destroy();
       // Group deals by month
       const months={};
@@ -553,6 +640,15 @@ document.querySelectorAll('.btn-svc').forEach(b=>{
     document.querySelectorAll('.btn-svc').forEach(x=>x.classList.remove('active'));
     b.classList.add('active');
     curSvc=b.dataset.svc;
+    render();
+  });
+});
+
+document.querySelectorAll('#platBtns .btn-svc').forEach(b=>{
+  b.addEventListener('click',()=>{
+    document.querySelectorAll('#platBtns .btn-svc').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active');
+    curPlat=b.dataset.plat;
     render();
   });
 });
