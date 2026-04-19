@@ -364,6 +364,7 @@ body.dark .camp-remarketing{background:#831843;color:#f9a8d4}
     <div class="scr"><table id="sfTable"></table></div>
   </div>
 
+  <div class="footer">PAAS Pocos Artesianos — Dashboard dinamico com <span id="totalDeals"></span> deals do RD Station CRM (2021–2026) | <span id="last-update" style="color:#999"></span></div>
   </div><!-- /tab-comercial -->
 
   <!-- TAB: TRÁFEGO PAGO -->
@@ -435,7 +436,6 @@ body.dark .camp-remarketing{background:#831843;color:#f9a8d4}
     </div>
   </div>
 
-  <div class="footer">PAAS Pocos Artesianos — Dashboard dinamico com <span id="totalDeals"></span> deals do RD Station CRM (2021–2026) | <span id="last-update" style="color:#999"></span></div>
 </div>
 
 <script>
@@ -704,7 +704,7 @@ function renderAll(){
     var icon = diff>=0 ? '↑' : '↓';
     var sign = diff>=0 ? '+' : '';
     var val;
-    if(isPct) val = sign+pctChange.toFixed(0)+'pp';
+    if(isPct){ var ppDiff = diff; val = sign+ppDiff.toFixed(1)+'pp'; }
     else if(isMoney) val = sign+Math.round(pctChange)+'%';
     else val = sign+Math.round(pctChange)+'%';
     return '<div class="sb" style="color:'+cor+';font-weight:600;font-size:9px;margin-top:1px">'+icon+' '+val+' vs mes ant.</div>';
@@ -901,7 +901,10 @@ function renderAll(){
   
   // Equipe
   renderEquipe(data.equipe);
-  
+
+  // Sem Fonte
+  renderSemFonte(deals, data);
+
   // Alert
   const alertC = data.campanhas.filter(c=>c.leads>=10&&c.vendas===0);
     window._alertCampNames = alertC.map(c=>c.name);
@@ -1615,7 +1618,7 @@ function preset(p){
   else if(p==="1y") from = new Date(today.getFullYear()-1, today.getMonth(), today.getDate());
   else if(p==="ytd") from = new Date(today.getFullYear(), 0, 1);
   else if(p==="mes") from = new Date(today.getFullYear(), today.getMonth(), 1);
-  else if(p==="hoje") from = new Date(today.getFullYear(), today.getMonth(), 1);
+  else if(p==="hoje") from = new Date(today.getFullYear(), today.getMonth(), today.getDate());
 
   dtFrom = from;
   // Mes atual: vai ate o ultimo dia do mes (pra pegar vendas com fechamento futuro). Data atual: vai ate hoje.
@@ -1810,7 +1813,13 @@ function renderAdsTab(){
 
   // Period info
   var pi = document.getElementById('ads-period-info');
-  if(pi && ADS_DATA.meta) pi.innerHTML = 'Periodo: <b>'+ADS_DATA.meta.period+'</b> | Comparativo: '+ADS_DATA.meta.prev_period;
+  if(pi && ADS_DATA.meta){
+    var tokenWarn = '';
+    if(ADS_DATA.meta.token_status && ADS_DATA.meta.token_status !== 'valid'){
+      tokenWarn = ' | <span style="color:#EF4444;font-weight:600">\u26A0\uFE0F Token '+ADS_DATA.meta.token_status+' \u2014 dados podem estar desatualizados</span>';
+    }
+    pi.innerHTML = 'Periodo: <b>'+ADS_DATA.meta.period+'</b> | Comparativo: '+ADS_DATA.meta.prev_period+tokenWarn;
+  }
 
   // Calculate deltas (prorated)
   var daysInMonth = new Date(new Date().getFullYear(), new Date().getMonth()+1, 0).getDate();
