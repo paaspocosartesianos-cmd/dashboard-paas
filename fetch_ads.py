@@ -132,7 +132,102 @@ def extract_cost_per_action(cost_actions, action_type):
         if a.get("action_type") == action_type:
             return float(a.get("value", 0))
     return 0
-FVbfWF6öFÇöç6vG5ö6Væ¶VB66÷VçEöBÂ6æ6RÂVçFÂÂFö¶Vâ ¢""$'W66ç6vG2F&÷2VÒ&Æö6÷2FR2ÖW6W2&WfF"FÖV÷WBöÆÖFW2â"" ¢ÆÅöFFÒµÐ¢6Væµ÷7F'BÒFFWFÖRç7G'FÖR6æ6RÂ"UÒVÒÒVB"¢VæEöFFRÒFFWFÖRç7G'FÖRVçFÂÂ"UÒVÒÒVB" ¢vÆR6Væµ÷7F'BÃÒVæEöFFS ¢6VæµöVæBÒÖâ6Væµ÷7F'B²FÖVFVÇFF3ÓÂVæEöFFR¢2Ò6Væµ÷7F'Bç7G&gFÖR"UÒVÒÒVB"¢RÒ6VæµöVæBç7G&gFÖR"UÒVÒÒVB"¢&çBb"FÇ·7Ò·WÒâââ" ¢fVÆG2Ò'7VæBÆ×&W76öç2Æ6Æ6·2Æ7Föç2Ç&V6 ¢W&ÂÒ¢b'´$4UõU$ÇÒ÷¶66÷VçEöGÒöç6vG2 ¢b#öfVÆG3×¶fVÆG7Ò ¢b"gFÖUöæ7&VÖVçCÓ ¢brgFÖU÷&ævS×·²'6æ6R#¢'·7Ò"Â'VçFÂ#¢'·WÒ'×Òp¢b"fÆÖCÓ ¢b"f66W75÷Fö¶Vã×·Fö¶VçÒ ¢¢&W7VÇBÒfWF6öÆÅ÷vW2W&Â¢b6ç7Fæ6R&W7VÇBÂF7BæB&W7VÇBævWB&W'&÷"" ¢&çBb"U%$ó¢·&W7VÇBævWBvW'&÷"rÒ"¢'&V°¢b&W7VÇBæB&W7VÇBævWB&FF" ¢ÆÅöFFæWFVæB&W7VÇE²&FF%Ò ¢6Væµ÷7F'BÒ6VæµöVæB²FÖVFVÇFF3Ó ¢&WGW&âÆÅöFF ¦FVbfWF6ö6×våöFÇö6Væ¶VB66÷VçEöBÂ6æ6RÂVçFÂÂFö¶Vâ ¢""$'W66ç6vG2F&÷2õ"4ÕäVÒ&Æö6÷2FR2ÖW6W2â"" ¢ÆÅöFFÒµÐ¢6Væµ÷7F'BÒFFWFÖRç7G'FÖR6æ6RÂ"UÒVÒÒVB"¢VæEöFFRÒFFWFÖRç7G'FÖRVçFÂÂ"UÒVÒÒVB" ¢vÆR6Væµ÷7F'BÃÒVæEöFFS ¢6VæµöVæBÒÖâ6Væµ÷7F'B²FÖVFVÇFF3ÓÂVæEöFFR¢2Ò6Væµ÷7F'Bç7G&gFÖR"UÒVÒÒVB"¢RÒ6VæµöVæBç7G&gFÖR"UÒVÒÒVB"¢&çBb"6×vâFÇ·7Ò·WÒâââ" ¢fVÆG2Ò&6×våöæÖRÆ6×våöBÇ7VæBÆ×&W76öç2Æ6Æ6·2Æ7Föç2Ç&V6Æ72Æ7ÒÆ7G" ¢W&ÂÒ¢b'´$4UõU$ÇÒ÷¶66÷VçEöGÒöç6vG2 ¢b#öfVÆG3×¶fVÆG7Ò ¢b"fÆWfVÃÖ6×vâ ¢b"gFÖUöæ7&VÖVçCÓ ¢brgFÖU÷&ævS×·²'6æ6R#¢'·7Ò"Â'VçFÂ#¢'·WÒ'×Òp¢b"fÆÖCÓS ¢b"f66W75÷Fö¶Vã×·Fö¶VçÒ ¢¢&W7VÇBÒfWF6öÆÅ÷vW2W&Â¢b6ç7Fæ6R&W7VÇBÂF7BæB&W7VÇBævWB&W'&÷"" ¢&çBb"U%$ó¢·&W7VÇBævWBvW'&÷"rÒ"¢'&V°¢b&W7VÇBæB&W7VÇBævWB&FF" ¢ÆÅöFFæWFVæB&W7VÇE²&FF%Ò ¢6Væµ÷7F'BÒ6VæµöVæB²FÖVFVÇFF3Ó ¢&WGW&âÆÅöFF ¦FVbÖâ ¢vÆö&ÂÔUDõDô´Tà ¢bæ÷BÔUDõDô´Tã ¢&çB$U%$ó¢ÔUDõDô´Tâæò6öæfwW&Fò"¢&WbÒÆöE÷&Wf÷W5öFF¢b&Wc ¢&We²&ÖWF%Õ²'Fö¶Vå÷7FGW2%ÒÒ&Ö76ær ¢&We²&ÖWF%Õ²&Æ7EöGFV×B%ÒÒFFWFÖRææ÷ræ6öf÷&ÖB¢vF÷VâõUEUEôdÄRÂ'r"ÂVæ6öFæsÒ'WFbÓ"2c ¢§6öâæGV×&WbÂbÂVç7W&Uö66ÔfÇ6RÂæFVçCÓ"¢&çB$FF÷2çFW&÷&W2&W6W'fF÷2"¢&WGW&à ¢FöFÒFFWFÖRææ÷r ¢2fÆF"Fö¶Và¢Fö¶Vå÷fÆBÂ×6rÒfÆFFU÷Fö¶VâÔUDõDô´Tâ¢bæ÷BFö¶Vå÷fÆC ¢&çBb$d4ó¢¶×6wÒ"¢&çB%FVçFæFòW7FVæFW"Fö¶Vââââ"¢æWu÷Fö¶VâÒG'öWFVæE÷Fö¶VâÔUDõDô´Tâ¢bæWu÷Fö¶Vã ¢ÔUDõDô´TâÒæWu÷Fö¶Và¢Fö¶Vå÷fÆBÒG'VP¢VÇ6S ¢&çB%Fö¶VâçfÆFòRæòfö÷76fVÂW7FVæFW"â"¢&WbÒÆöE÷&Wf÷W5öFF¢b&Wc      prev["meta"]["token_status"] = "expired"
+
+def fetch_daily_insights_chunked(account_id, since, until, token):
+    """Busca insights diarios em blocos de 3 meses para evitar timeout/limites."""
+    all_data = []
+    chunk_start = datetime.strptime(since, "%Y-%m-%d")
+    end_date = datetime.strptime(until, "%Y-%m-%d")
+
+    while chunk_start <= end_date:
+        chunk_end = min(chunk_start + timedelta(days=89), end_date)
+        s = chunk_start.strftime("%Y-%m-%d")
+        u = chunk_end.strftime("%Y-%m-%d")
+        print(f"  Daily {s} a {u}...")
+
+        fields = "spend,impressions,clicks,actions,reach"
+        url = (
+            f"{BASE_URL}/{account_id}/insights"
+            f"?fields={fields}"
+            f"&time_increment=1"
+            f'&time_range={{"since":"{s}","until":"{u}"}}'
+            f"&limit=100"
+            f"&access_token={token}"
+        )
+        result = fetch_all_pages(url)
+        if isinstance(result, dict) and result.get("error"):
+            print(f"  ERRO: {result.get('error')}")
+            break
+        if result and result.get("data"):
+            all_data.extend(result["data"])
+
+        chunk_start = chunk_end + timedelta(days=1)
+
+    return all_data
+
+def fetch_campaign_daily_chunked(account_id, since, until, token):
+    """Busca insights diarios POR CAMPANHA em blocos de 3 meses."""
+    all_data = []
+    chunk_start = datetime.strptime(since, "%Y-%m-%d")
+    end_date = datetime.strptime(until, "%Y-%m-%d")
+
+    while chunk_start <= end_date:
+        chunk_end = min(chunk_start + timedelta(days=89), end_date)
+        s = chunk_start.strftime("%Y-%m-%d")
+        u = chunk_end.strftime("%Y-%m-%d")
+        print(f"  Campaign daily {s} a {u}...")
+
+        fields = "campaign_name,campaign_id,spend,impressions,clicks,actions,reach,cpc,cpm,ctr"
+        url = (
+            f"{BASE_URL}/{account_id}/insights"
+            f"?fields={fields}"
+            f"&level=campaign"
+            f"&time_increment=1"
+            f'&time_range={{"since":"{s}","until":"{u}"}}'
+            f"&limit=500"
+            f"&access_token={token}"
+        )
+        result = fetch_all_pages(url)
+        if isinstance(result, dict) and result.get("error"):
+            print(f"  ERRO: {result.get('error')}")
+            break
+        if result and result.get("data"):
+            all_data.extend(result["data"])
+
+        chunk_start = chunk_end + timedelta(days=1)
+
+    return all_data
+
+def main():
+    global META_TOKEN
+
+    if not META_TOKEN:
+        print("ERRO: META_TOKEN nao configurado")
+        prev = load_previous_data()
+        if prev:
+            prev["meta"]["token_status"] = "missing"
+            prev["meta"]["last_attempt"] = datetime.now().isoformat()
+            with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
+                json.dump(prev, f, ensure_ascii=False, indent=2)
+            print("Dados anteriores preservados")
+        return
+
+    today = datetime.now()
+
+    # Validar token
+    token_valid, msg = validate_token(META_TOKEN)
+    if not token_valid:
+        print(f"AVISO: {msg}")
+        print("Tentando estender token...")
+        new_token = try_extend_token(META_TOKEN)
+        if new_token:
+            META_TOKEN = new_token
+            token_valid = True
+        else:
+            print("Token invalido e nao foi possivel estender.")
+            prev = load_previous_data()
+            if prev:
+                prev["meta"]["token_status"] = "expired"
                 prev["meta"]["last_attempt"] = today.isoformat()
                 prev["meta"]["error"] = msg
                 with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
@@ -313,30 +408,77 @@ def extract_cost_per_action(cost_actions, action_type):
                     "leads": leads,
                     "messages": messages,
                 })
-ÈØ[Ý[\ÝZ\ÈY\È]X[Ý[ÜÜ[HÝ[JÖÈÜ[HÜÈ[[ØØ[\ZYÛÊBÝ[Ú[\\ÜÚ[ÛÈHÝ[JÖÈ[\\ÜÚ[ÛÈHÜÈ[[ØØ[\ZYÛÊBÝ[ØÛXÚÜÈHÝ[JÖÈÛXÚÜÈHÜÈ[[ØØ[\ZYÛÊBÝ[ÛXYÈHÝ[JÖÈXYÈHÜÈ[[ØØ[\ZYÛÊBÝ[ÛY\ÜØYÙ\ÈHÝ[JÖÈY\ÜØYÙ\ÈHÜÈ[[ØØ[\ZYÛÊBÝ[ÜXXÚHÝ[JÖÈXXÚHÜÈ[[ØØ[\ZYÛÊBÝ[ØÛÛ\Ú[ÛÈHÝ[ÛXYÈ
-ÈÝ[ÛY\ÜØYÙ\ÂÈÝZ\ÈY\È[\[Ü]ÜÜ[HÝ[JÖÈÜ[HÜÈ[]ØØ[\ZYÛÊB]ÛXYÈHÝ[JÖÈXYÈHÜÈ[]ØØ[\ZYÛÊB]ÛY\ÜØYÙ\ÈHÝ[JÖÈY\ÜØYÙ\ÈHÜÈ[]ØØ[\ZYÛÊB]ØÛXÚÜÈHÝ[JÖÈÛXÚÜÈHÜÈ[]ØØ[\ZYÛÊBÈ[Û\Ý]]Ý]]HÂY]HÂ]ÚYØ]Ù^K\ÛÙÜX]
 
-K\ÝÜWÜÝ\TÕÔWÔÕT\[ÙØÝ\[ÜÚ[ÙWØÝ\[HHÝ[[ØÝ\[H\[ÙÜ]ÜÚ[ÙWÜ]HHÝ[[Ü]HYØXØÛÝ[ÈQÐPÐÓÕSÒQËÚÙ[ÜÝ]\È[YZ[WÜXÛÜÈ[Z[WÙ]JKØ[\ZYÛÙZ[WÜXÛÜÈ[Ø[\ZYÛÙZ[WÜ]ÊKKÜ\ÈÂ[\Ý[Y[ÈÝ[ÜÜ[[\\ÜÛÙ\ÈÝ[Ú[\\ÜÚ[ÛËÛ\]Y\ÈÝ[ØÛXÚÜË[Ø[ÙHÝ[ÜXXÚXYÈÝ[ÛXYËY[ØYÙ[ÈÝ[ÛY\ÜØYÙ\ËÛÛ\ÛÙ\ÈÝ[ØÛÛ\Ú[ÛËÜÝ[ÜÜ[ÈÝ[ÛXYÈYÝ[ÛXYÈ[ÙHÜWÛYY[È
-Ý[ÜÜ[ÈÝ[Ú[\\ÜÚ[ÛÈ
-L
-HYÝ[Ú[\\ÜÚ[ÛÈ[ÙHÝÛYY[È
-Ý[ØÛXÚÜÈÈÝ[Ú[\\ÜÚ[ÛÈ
-L
-HYÝ[Ú[\\ÜÚ[ÛÈ[ÙHÝ\Ý×ÜÜØÛÛ\Ø[ÈÝ[ÜÜ[ÈÝ[ØÛÛ\Ú[ÛÈYÝ[ØÛÛ\Ú[ÛÈ[ÙHKÜ\×Ü]Â[\Ý[Y[È]ÜÜ[XYÈ]ÛXYËY[ØYÙ[È]ÛY\ÜØYÙ\ËÛ\]Y\È]ØÛXÚÜËÛÛ\ÛÙ\È]ÛXYÈ
-È]ÛY\ÜØYÙ\ËKØ[\ZYÛÈÛÜY
-[ØØ[\ZYÛËÙ^O[[XHÈÜ[K]\ÙOUYJKZ[HÛÜY
-Z[WÙ]KÙ^O[[XHÈ]HJKØ[\ZYÛÙZ[HÛÜY
-Ø[\ZYÛÙZ[WÜ]ËÙ^O[[XH
-È]HKÈØ[\ZYÛÛ[YHJJKBY\WÙ\ÜÎÝ]]ÈY]HVÈ\X[Ù\ÜÈHH\WÙ\ÜÂÈØ[\ÓÓÚ]Ü[ÕUUÑSKÈ[ÛÙ[ÏH]NH\ÈÛÛ[\
-Ý]][Ý\WØ\ØÚZOQ[ÙK[[LB[
-OOHY]HYÈH\Ý[[ÈOOHB[
-\ÝÜXÛÈ\ÙNÒTÕÔWÔÕTHB[
-X\ÈHYÜÈX\[ÜÎÛ[Z[WÙ]J_HB[
-YÚ\ÝÜÈØ[\[KÙXNÛ[Ø[\ZYÛÙZ[WÜ]Ê_HB[
-Ø[\[\ÈY\È]X[Û[[ØØ[\ZYÛÊ_HB[
-[\Ý[Y[ÈY\È]X[ÝÝ[ÜÜ[HB[
-XYÈY\È]X[ÝÝ[ÛXYßHB[
-Y[ØYÙ[ÈY\È]X[ÝÝ[ÛY\ÜØYÙ\ßHBY\WÙ\ÜÎ[
-UTÓÈH\ÜÈ\ÚXZ\ÎØ\WÙ\ÜßHB[
-\]Z]ÈØ[ÎÓÕUUÑS_HBY×Û[YW×ÈOH×ÛXZ[×ÈXZ[
-B
+    # Calcular totais mes atual
+    total_spend = sum(c["spend"] for c in all_campaigns)
+    total_impressions = sum(c["impressions"] for c in all_campaigns)
+    total_clicks = sum(c["clicks"] for c in all_campaigns)
+    total_leads = sum(c["leads"] for c in all_campaigns)
+    total_messages = sum(c["messages"] for c in all_campaigns)
+    total_reach = sum(c["reach"] for c in all_campaigns)
+    total_conversions = total_leads + total_messages
+
+    # Totais mes anterior
+    prev_spend = sum(c["spend"] for c in prev_campaigns)
+    prev_leads = sum(c["leads"] for c in prev_campaigns)
+    prev_messages = sum(c["messages"] for c in prev_campaigns)
+    prev_clicks = sum(c["clicks"] for c in prev_campaigns)
+
+    # Montar output
+    output = {
+        "meta": {
+            "fetched_at": today.isoformat(),
+            "history_start": HISTORY_START,
+            "period_current": f"{since_current} a {until_current}",
+            "period_prev": f"{since_prev} a {until_prev}",
+            "ad_accounts": AD_ACCOUNT_IDS,
+            "token_status": "valid",
+            "daily_records": len(daily_data),
+            "campaign_daily_records": len(campaign_daily_raw),
+        },
+        "kpis": {
+            "investimento": total_spend,
+            "impressoes": total_impressions,
+            "cliques": total_clicks,
+            "alcance": total_reach,
+            "leads": total_leads,
+            "mensagens": total_messages,
+            "conversoes": total_conversions,
+            "cpl": total_spend / total_leads if total_leads > 0 else 0,
+            "cpm_medio": (total_spend / total_impressions * 1000) if total_impressions > 0 else 0,
+            "ctr_medio": (total_clicks / total_impressions * 100) if total_impressions > 0 else 0,
+            "custo_por_conversao": total_spend / total_conversions if total_conversions > 0 else 0,
+        },
+        "kpis_prev": {
+            "investimento": prev_spend,
+            "leads": prev_leads,
+            "mensagens": prev_messages,
+            "cliques": prev_clicks,
+            "conversoes": prev_leads + prev_messages,
+        },
+        "campaigns": sorted(all_campaigns, key=lambda x: x["spend"], reverse=True),
+        "daily": sorted(daily_data, key=lambda x: x["date"]),
+        "campaign_daily": sorted(campaign_daily_raw, key=lambda x: (x["date"], x["campaign_name"])),
+    }
+
+    if api_errors:
+        output["meta"]["partial_errors"] = api_errors
+
+    # Salvar JSON
+    with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
+        json.dump(output, f, ensure_ascii=False, indent=2)
+
+    print(f"\n=== Meta Ads - Resumo ===")
+    print(f"Historico desde: {HISTORY_START}")
+    print(f"Dias de dados diarios: {len(daily_data)}")
+    print(f"Registros campanha/dia: {len(campaign_daily_raw)}")
+    print(f"Campanhas mes atual: {len(all_campaigns)}")
+    print(f"Investimento mes atual: R$ {total_spend:,.2f}")
+    print(f"Leads mes atual: {total_leads}")
+    print(f"Mensagens mes atual: {total_messages}")
+    if api_errors:
+        print(f"\nAVISO - Erros parciais: {api_errors}")
+    print(f"\nArquivo salvo: {OUTPUT_FILE}")
+
+if __name__ == "__main__":
+    main()
