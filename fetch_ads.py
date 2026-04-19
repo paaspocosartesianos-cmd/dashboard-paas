@@ -6,7 +6,7 @@ Usa a Marketing API do Facebook/Meta para obter insights de campanhas.
 Melhorias:
 - Detecta token expirado e tenta estender automaticamente
 - Preserva dados anteriores quando a API falha
-- Suporte a token de longa duração (60 dias)
+- Suporte a token de longa duraÃ§Ã£o (60 dias)
 """
 import os
 import sys
@@ -285,6 +285,20 @@ def main():
         else:
             print("ERRO: Sem dados anteriores para preservar!")
         return
+
+    # Agregar daily_data por data (somar contas)
+    daily_agg = {}
+    for d in daily_data:
+        dt = d["date"]
+        if dt not in daily_agg:
+            daily_agg[dt] = {"date": dt, "spend": 0, "impressions": 0, "clicks": 0, "reach": 0, "leads": 0, "messages": 0}
+        daily_agg[dt]["spend"] += d["spend"]
+        daily_agg[dt]["impressions"] += d["impressions"]
+        daily_agg[dt]["clicks"] += d["clicks"]
+        daily_agg[dt]["reach"] += d["reach"]
+        daily_agg[dt]["leads"] += d["leads"]
+        daily_agg[dt]["messages"] += d["messages"]
+    daily_data = list(daily_agg.values())
 
     # Buscar dados do mes anterior para comparativo
     prev_campaigns = []
