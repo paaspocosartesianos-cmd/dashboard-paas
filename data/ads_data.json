@@ -1,62 +1,34 @@
 {
   "meta": {
-    "fetched_at": "2026-04-19T08:52:40.024Z",
+    "fetched_at": "2026-04-19T10:15:46.739811",
     "period": "2026-04-01 a 2026-04-19",
-    "prev_period": "2026-03-01 a 2026-03-31"
+    "prev_period": "2026-03-01 a 2026-03-31",
+    "ad_accounts": [
+      "act_656534222273647",
+      "act_568178800458922",
+      "act_545763446485919"
+    ]
   },
   "kpis": {
-    "investimento": 6913.52,
-    "impressoes": 664542,
-    "cliques": 15589,
-    "alcance": 331872,
-    "leads": 65,
-    "mensagens": 115,
-    "conversoes": 180,
-    "cpl": 106.36,
-    "cpm_medio": 10.40,
-    "ctr_medio": 2.35,
-    "custo_por_conversao": 38.41
+    "investimento": 0,
+    "impressoes": 0,
+    "cliques": 0,
+    "alcance": 0,
+    "leads": 0,
+    "mensagens": 0,
+    "conversoes": 0,
+    "cpl": 0,
+    "cpm_medio": 0,
+    "ctr_medio": 0,
+    "custo_por_conversao": 0
   },
   "kpis_prev": {
-    "investimento": 14532.81,
-    "leads": 180,
-    "mensagens": 289,
-    "cliques": 31888,
-    "conversoes": 469
+    "investimento": 0,
+    "leads": 0,
+    "mensagens": 0,
+    "cliques": 0,
+    "conversoes": 0
   },
-  "campaigns": [
-    {"campaign_name":"[ENGAJAMENTO] WHATSAPP POÃO ARTESIANO","spend":1608.29,"impressions":197887,"clicks":1615,"reach":70220,"leads":0,"messages":94,"cpc":0.996,"cpm":8.13,"ctr":0.82,"landing_page_views":7},
-    {"campaign_name":"[CADASTRO] OUTORGA-RS","spend":1314.69,"impressions":79514,"clicks":2998,"reach":44018,"leads":19,"messages":9,"cpc":0.44,"cpm":16.53,"ctr":3.77,"landing_page_views":871},
-    {"campaign_name":"[CADASTRO] POÃO ARTESIANO","spend":973.88,"impressions":61246,"clicks":1114,"reach":22246,"leads":15,"messages":1,"cpc":0.87,"cpm":15.90,"ctr":1.82,"landing_page_views":540},
-    {"campaign_name":"[CADASTRO] IRRIGAÃÃO","spend":730.28,"impressions":29930,"clicks":397,"reach":16863,"leads":4,"messages":2,"cpc":1.84,"cpm":24.40,"ctr":1.33,"landing_page_views":170},
-    {"campaign_name":"[CADASTRO] HIDROPAAS","spend":531.85,"impressions":19776,"clicks":473,"reach":9513,"leads":13,"messages":4,"cpc":1.12,"cpm":26.89,"ctr":2.39,"landing_page_views":151},
-    {"campaign_name":"[CADASTRO] FILTRO â incremental â 2","spend":440.88,"impressions":51375,"clicks":559,"reach":20377,"leads":2,"messages":4,"cpc":0.79,"cpm":8.58,"ctr":1.09,"landing_page_views":363},
-    {"campaign_name":"[LEAD] POÃO_LITORAL_SC","spend":356.09,"impressions":17915,"clicks":542,"reach":9946,"leads":9,"messages":1,"cpc":0.66,"cpm":19.88,"ctr":3.03,"landing_page_views":147},
-    {"campaign_name":"[TRAFEGO] POÃO ARTESIANO","spend":355.68,"impressions":55855,"clicks":2022,"reach":26945,"leads":0,"messages":0,"cpc":0.18,"cpm":6.37,"ctr":3.62,"landing_page_views":991},
-    {"campaign_name":"[TRÃFEGO] - OUTORGA RS","spend":316.65,"impressions":110446,"clicks":4433,"reach":91260,"leads":0,"messages":0,"cpc":0.07,"cpm":2.87,"ctr":4.01,"landing_page_views":1634},
-    {"campaign_name":"[TRAFEGO] IRRIGAÃÃO","spend":179.94,"impressions":36134,"clicks":1394,"reach":19778,"leads":0,"messages":0,"cpc":0.13,"cpm":4.98,"ctr":3.86,"landing_page_views":650},
-    {"campaign_name":"[CADASTRO] REMARKETING HIDROPAAS","spend":105.29,"impressions":4464,"clicks":42,"reach":706,"leads":3,"messages":0,"cpc":2.51,"cpm":23.59,"ctr":0.94,"landing_page_views":22}
-  ],
-  "daily": [
-    {"date":"2026-04-01","spend":390.40,"impressions":37085,"clicks":851,"reach":30299,"leads":0,"messages":14},
-    {"date":"2026-04-02","spend":359.92,"impressions":34840,"clicks":809,"reach":27635,"leads":5,"messages":7},
-    {"date":"2026-04-03","spend":365.01,"impressions":35156,"clicks":797,"reach":29269,"leads":2,"messages":1},
-    {"date":"2026-04-04","spend":339.72,"impressions":38793,"clicks":938,"reach":34430,"leads":3,"messages":5},
-    {"date":"2026-04-05","spend":444.50,"impressions":46079,"clicks":1067,"reach":38248,"leads":4,"messages":4},
-    {"date":"2026-04-06","spend":394.14,"impressions":42277,"clicks":948,"reach":36297,"leads":5,"messages":6},
-    {"date":"2026-04-07","spend":407.21,"impressions":42618,"clicks":1079,"reach":34589,"leads":7,"messages":8},
-    {"date":"2026-04-08","spend":371.22,"impressions":33935,"clicks":826,"reach":26987,"leads":6,"messages":7},
-    {"date":"2026-04-09","spend":355.38,"impressions":32458,"clicks":787,"reach":26780,"leads":3,"messages":5},
-    {"date":"2026-04-10","spend":367.99,"impressions":34206,"clicks":813,"reach":28743,"leads":2,"messages":8},
-    {"date":"2026-04-11","spend":375.17,"impressions":35024,"clicks":870,"reach":29453,"leads":4,"messages":6},
-    {"date":"2026-04-12","spend":352.89,"impressions":33512,"clicks":810,"reach":27654,"leads":3,"messages":5},
-    {"date":"2026-04-13","spend":388.91,"impressions":36845,"clicks":892,"reach":30876,"leads":5,"messages":7},
-    {"date":"2026-04-14","spend":362.45,"impressions":34123,"clicks":825,"reach":28345,"leads":2,"messages":9},
-    {"date":"2026-04-15","spend":340.28,"impressions":32654,"clicks":798,"reach":27123,"leads":3,"messages":4},
-    {"date":"2026-04-16","spend":358.67,"impressions":34890,"clicks":845,"reach":28976,"leads":2,"messages":8},
-    {"date":"2026-04-17","spend":365.54,"impressions":35028,"clicks":862,"reach":29534,"leads":4,"messages":6},
-    {"date":"2026-04-18","spend":312.40,"impressions":28600,"clicks":828,"reach":22742,"leads":4,"messages":8},
-    {"date":"2026-04-19","spend":31.63,"impressions":2514,"clicks":119,"reach":2284,"leads":1,"messages":0}
-  ]
+  "campaigns": [],
+  "daily": []
 }
-
