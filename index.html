@@ -922,6 +922,11 @@ function renderAll(){
   
   // Charts
   renderCharts(data);
+
+  // Also update Trafego Pago tab if active
+  if(document.getElementById('tab-trafego') && document.getElementById('tab-trafego').classList.contains('active')){
+    renderAdsTab();
+  }
 }
 
 function renderFilters(){
@@ -1806,19 +1811,42 @@ var adsCampFilter = 'all';
 
 function renderAdsTab(){
   if(!ADS_DATA) return;
-  var k = ADS_DATA.kpis;
   var kp = ADS_DATA.kpis_prev;
   var camps = ADS_DATA.campaigns || [];
-  var daily = ADS_DATA.daily || [];
+  var allDaily = ADS_DATA.daily || [];
 
-  // Period info
+  // Filter daily data by dtFrom/dtTo date range
+  var daily = allDaily.filter(function(d){
+    var dd = new Date(d.date+'T12:00:00');
+    return dd >= dtFrom && dd <= dtTo;
+  });
+
+  // Recalculate KPIs from filtered daily data
+  var k = {};
+  k.investimento = daily.reduce(function(a,d){return a+(d.spend||0)},0);
+  k.impressoes = daily.reduce(function(a,d){return a+(d.impressions||0)},0);
+  k.cliques = daily.reduce(function(a,d){return a+(d.clicks||0)},0);
+  k.alcance = daily.reduce(function(a,d){return a+(d.reach||0)},0);
+  k.leads = daily.reduce(function(a,d){return a+(d.leads||0)},0);
+  k.mensagens = daily.reduce(function(a,d){return a+(d.messages||0)},0);
+  k.conversoes = k.leads + k.mensagens;
+  k.cpl = k.leads > 0 ? k.investimento / k.leads : 0;
+  k.cpm_medio = k.impressoes > 0 ? (k.investimento / k.impressoes * 1000) : 0;
+  k.ctr_medio = k.impressoes > 0 ? (k.cliques / k.impressoes * 100) : 0;
+  k.custo_por_conversao = k.conversoes > 0 ? k.investimento / k.conversoes : 0;
+
+  // Period info — show user-selected date range
   var pi = document.getElementById('ads-period-info');
-  if(pi && ADS_DATA.meta){
+  if(pi){
     var tokenWarn = '';
-    if(ADS_DATA.meta.token_status && ADS_DATA.meta.token_status !== 'valid'){
-      tokenWarn = ' | <span style="color:#EF4444;font-weight:600">\u26A0\uFE0F Token '+ADS_DATA.meta.token_status+' \u2014 dados podem estar desatualizados</span>';
+    if(ADS_DATA.meta && ADS_DATA.meta.token_status && ADS_DATA.meta.token_status !== 'valid'){
+      tokenWarn = ' | <span style="color:#EF4444;font-weight:600">\u26a0\ufe0f Token '+ADS_DATA.meta.token_status+' \u2014 dados podem estar desatualizados</span>';
     }
-    pi.innerHTML = 'Periodo: <b>'+ADS_DATA.meta.period+'</b> | Comparativo: '+ADS_DATA.meta.prev_period+tokenWarn;
+    var fromStr = dtFrom.toLocaleDateString('pt-BR');
+    var toStr = dtTo.toLocaleDateString('pt-BR');
+    var totalDays = allDaily.length;
+    var filteredDays = daily.length;
+    pi.innerHTML = 'Periodo: <b>'+fromStr+' a '+toStr+'</b> ('+filteredDays+' dias com dados de '+totalDays+' disponiveis)'+tokenWarn;
   }
 
   // Calculate deltas (prorated)
