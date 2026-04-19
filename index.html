@@ -1632,16 +1632,19 @@ function preset(p){
   document.getElementById("dtFrom").value = toLocal(from);
   document.getElementById("dtTo").value = toLocal(endDate);
   
-  document.querySelectorAll(".preset-btn").forEach(b=>b.classList.remove("active"));
-  event.target.classList.add("active");
+  document.querySelectorAll(".preset-btn").forEach(function(b){
+    b.classList.remove("active");
+    var oc = b.getAttribute("onclick")||"";
+    if(oc.indexOf("'"+p+"'") >= 0) b.classList.add("active");
+  });
   renderAll();
 }
 
 function applyDates(){
   const f = document.getElementById("dtFrom").value;
   const t = document.getElementById("dtTo").value;
-  if(f) dtFrom = new Date(f);
-  if(t) dtTo = new Date(t);
+  if(f) dtFrom = new Date(f+"T12:00:00");
+  if(t) dtTo = new Date(t+"T12:00:00");
   document.querySelectorAll(".preset-btn").forEach(b=>b.classList.remove("active"));
   renderAll();
 }
