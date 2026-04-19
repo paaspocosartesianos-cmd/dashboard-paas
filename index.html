@@ -1812,8 +1812,9 @@ var adsCampFilter = 'all';
 function renderAdsTab(){
   if(!ADS_DATA) return;
   var kp = ADS_DATA.kpis_prev;
-  var camps = ADS_DATA.campaigns || [];
+  var allCamps = ADS_DATA.campaigns || [];
   var allDaily = ADS_DATA.daily || [];
+  var campDaily = ADS_DATA.campaign_daily || [];
 
   // Filter daily data by dtFrom/dtTo date range
   var daily = allDaily.filter(function(d){
@@ -1849,7 +1850,39 @@ function renderAdsTab(){
     pi.innerHTML = 'Periodo: <b>'+fromStr+' a '+toStr+'</b> ('+filteredDays+' dias com dados de '+totalDays+' disponiveis)'+tokenWarn;
   }
 
-  // Calculate deltas (prorated)
+  // Rebuild campaigns from campaign_daily filtered by date range
+  var camps;
+  if(campDaily.length > 0){
+    var filteredCampDaily = campDaily.filter(function(d){
+      var dd = new Date(d.date+'T12:00:00');
+      return dd >= dtFrom && dd <= dtTo;
+    });
+    // Aggregate by campaign_name
+    var campMap = {};
+    filteredCampDaily.forEach(function(d){
+      var cn = d.campaign_name;
+      if(!campMap[cn]){
+        campMap[cn] = {campaign_name:cn, campaign_id:d.campaign_id, spend:0, impressions:0, clicks:0, reach:0, leads:0, messages:0, landing_page_views:0};
+      }
+      campMap[cn].spend += d.spend||0;
+      campMap[cn].impressions += d.impressions||0;
+      campMap[cn].clicks += d.clicks||0;
+      campMap[cn].reach += d.reach||0;
+      campMap[cn].leads += d.leads||0;
+      campMap[cn].messages += d.messages||0;
+      campMap[cn].landing_page_views += d.landing_page_views||0;
+    });
+    camps = Object.values(campMap).map(function(c){
+      c.ctr = c.impressions > 0 ? (c.clicks/c.impressions*100) : 0;
+      c.cpc = c.clicks > 0 ? (c.spend/c.clicks) : 0;
+      c.cpm = c.impressions > 0 ? (c.spend/c.impressions*1000) : 0;
+      return c;
+    }).sort(function(a,b){return b.spend - a.spend});
+  } else {
+    camps = allCamps;
+  }
+
+    // Calculate deltas (prorated)
   var daysInMonth = new Date(new Date().getFullYear(), new Date().getMonth()+1, 0).getDate();
   var daysPassed = daily.length || new Date().getDate();
   var projFactor = daysInMonth / Math.max(daysPassed, 1);
