@@ -130,6 +130,20 @@ def fetch_daily_insights(account_id, since, until, token):
     )
     return fetch_json(url)
 
+def fetch_campaign_daily_insights(account_id, since, until, token):
+    """Busca insights diarios POR CAMPANHA para permitir filtro de data na tabela."""
+    fields = "campaign_name,campaign_id,spend,impressions,clicks,actions,reach,cpc,cpm,ctr"
+    url = (
+        f"{BASE_URL}/{account_id}/insights"
+        f"?fields={fields}"
+        f"&level=campaign"
+        f"&time_increment=1"
+        f'&time_range={{\"since\":\"{since}\",\"until\":\"{until}\"}}'
+        f"&limit=500"
+        f"&access_token={token}"
+    )
+    return fetch_json(url)
+
 def extract_action_value(actions, action_type):
     """Extrai valor de uma acao especifica da lista de actions."""
     if not actions:
@@ -202,6 +216,7 @@ def main():
 
     all_campaigns = []
     daily_data = []
+    campaign_daily_data = []
     api_errors = []
 
     for account_id in AD_ACCOUNT_IDS:
@@ -268,6 +283,29 @@ def main():
                         d.get("actions"),
                         "onsite_conversion.messaging_conversation_started_7d"
                     ),
+                })
+
+        # Insights diarios POR CAMPANHA - para filtro de data na tabela
+        camp_daily_result = fetch_campaign_daily_insights(account_id, since_current, until_current, META_TOKEN)
+        if camp_daily_result and camp_daily_result.get("data"):
+            for d in camp_daily_result["data"]:
+                leads = extract_action_value(d.get("actions"), "lead")
+                messages = extract_action_value(
+                    d.get("actions"),
+                    "onsite_conversion.messaging_conversation_started_7d"
+                )
+                landing_views = extract_action_value(d.get("actions"), "landing_page_view")
+                campaign_daily_data.append({
+                    "date": d.get("date_start", ""),
+                    "campaign_name": d.get("campaign_name", ""),
+                    "campaign_id": d.get("campaign_id", ""),
+                    "spend": float(d.get("spend", 0)),
+                    "impressions": int(d.get("impressions", 0)),
+                    "clicks": int(d.get("clicks", 0)),
+                    "reach": int(d.get("reach", 0)),
+                    "leads": leads,
+                    "messages": messages,
+                    "landing_page_views": landing_views,
                 })
 
     # Se todas as contas falharam com erro de token, preservar dados anteriores
@@ -366,6 +404,7 @@ def main():
         },
         "campaigns": sorted(all_campaigns, key=lambda x: x["spend"], reverse=True),
         "daily": sorted(daily_data, key=lambda x: x["date"]),
+        "campaign_daily": sorted(campaign_daily_data, key=lambda x: (x["date"], x["campaign_name"])),
     }
 
     if api_errors:
