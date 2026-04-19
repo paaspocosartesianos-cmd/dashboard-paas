@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ROAS & Funil â PAAS Dashboard</title>
+<title>ROAS & Funil &mdash; PAAS Dashboard</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:-apple-system,system-ui,'Segoe UI',Roboto,sans-serif;background:#f3f4f6;color:#1e293b;font-size:15px}
@@ -86,12 +86,12 @@ canvas{max-height:280px}
 
 <div class="hdr">
   <div>
-    <h1>ð ROAS & Funil por Servico / UTM</h1>
-    <div style="font-size:12px;opacity:.7;margin-top:3px">PAAS Pocos Artesianos â Meta Ads + Google Ads + CRM</div>
+    <h1>&#128202; ROAS & Funil por Servico / UTM</h1>
+    <div style="font-size:12px;opacity:.7;margin-top:3px">PAAS Pocos Artesianos &mdash; Meta Ads + Google Ads + CRM</div>
   </div>
   <div style="display:flex;gap:10px;align-items:center">
-    <a href="index.html" class="nav-link">â Dashboard Principal</a>
-    <button onclick="document.documentElement.classList.toggle('dark')" style="background:none;border:1px solid rgba(255,255,255,.4);color:#fff;padding:5px 10px;border-radius:5px;cursor:pointer;font-size:12px">ð</button>
+    <a href="index.html" class="nav-link">&larr; Dashboard Principal</a>
+    <button onclick="document.documentElement.classList.toggle('dark')" style="background:none;border:1px solid rgba(255,255,255,.4);color:#fff;padding:5px 10px;border-radius:5px;cursor:pointer;font-size:12px">&#127769;</button>
   </div>
 </div>
 
@@ -113,9 +113,9 @@ canvas{max-height:280px}
 <div class="filter-row">
   <label>Plataforma:</label>
   <div class="btn-group" id="platBtns">
-    <button class="btn-svc active" data-plat="TODOS" style="font-size:11px">ð Todos</button>
-    <button class="btn-svc" data-plat="META" style="font-size:11px">ð Meta</button>
-    <button class="btn-svc" data-plat="GOOGLE" style="font-size:11px">ð Google</button>
+    <button class="btn-svc active" data-plat="TODOS" style="font-size:11px">&#128202; Todos</button>
+    <button class="btn-svc" data-plat="META" style="font-size:11px">&#128216; Meta</button>
+    <button class="btn-svc" data-plat="GOOGLE" style="font-size:11px">&#128269; Google</button>
   </div>
   <label style="margin-left:16px">UTM / Campanha:</label>
   <select id="utmFilter">
@@ -154,7 +154,7 @@ let DEALS=[],ADS={},GADS={},curSvc='TODOS',curPlat='TODOS',search='',curUtm='',c
 let pieChart=null,barChart=null;
 
 const SVC_KW={
-  'POCO':['poco','poÃ§o','well','artesian','litoral','artesiano'],
+  'POCO':['poco','po&ccedil;o','well','artesian','litoral','artesiano'],
   'OUTORGA':['outorga','grant','licen'],
   'IRRIGACAO':['irriga','irrigation'],
   'FILTRO':['filtro','filter','filtr'],
@@ -345,7 +345,7 @@ function render(){
   if(filters.length>0){
     h+='<div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:10px 16px;margin-bottom:16px;font-size:13px;color:#1e40af">';
     h+='<strong>Filtros ativos:</strong> '+filters.join(' | ');
-    h+=' â <strong>'+fN(totalDeals)+'</strong> deals encontrados';
+    h+=' &mdash; <strong>'+fN(totalDeals)+'</strong> deals encontrados';
     h+='</div>';
   }
 
@@ -356,12 +356,12 @@ function render(){
     h+='<div style="background:#fff;border-radius:10px;padding:14px 18px;margin-bottom:16px;box-shadow:0 1px 3px rgba(0,0,0,.06)">';
     h+='<div style="font-size:12px;font-weight:600;color:#6b7280;margin-bottom:8px">INVESTIMENTO POR PLATAFORMA</div>';
     h+='<div style="display:flex;height:28px;border-radius:6px;overflow:hidden;font-size:12px;font-weight:600;color:#fff">';
-    if(metaSpend>0)h+='<div style="background:#1877f2;width:'+mPct+'%;display:flex;align-items:center;justify-content:center;min-width:60px" title="Meta Ads: '+fmt(metaSpend)+'">ð Meta '+mPct+'%</div>';
-    if(gSpend>0)h+='<div style="background:#ea4335;width:'+gPct+'%;display:flex;align-items:center;justify-content:center;min-width:60px" title="Google Ads: '+fmt(gSpend)+'">ð Google '+gPct+'%</div>';
+    if(metaSpend>0)h+='<div style="background:#1877f2;width:'+mPct+'%;display:flex;align-items:center;justify-content:center;min-width:60px" title="Meta Ads: '+fmt(metaSpend)+'">&#128216; Meta '+mPct+'%</div>';
+    if(gSpend>0)h+='<div style="background:#ea4335;width:'+gPct+'%;display:flex;align-items:center;justify-content:center;min-width:60px" title="Google Ads: '+fmt(gSpend)+'">&#128269; Google '+gPct+'%</div>';
     h+='</div>';
     h+='<div style="display:flex;justify-content:space-between;margin-top:6px;font-size:11px;color:#6b7280">';
-    h+='<span>ð Meta: '+fmt(metaSpend)+' ('+fN(metaClicks)+' cliques)</span>';
-    h+='<span>ð Google: '+fmt(gSpend)+' ('+fN(gClicks)+' cliques)</span>';
+    h+='<span>&#128216; Meta: '+fmt(metaSpend)+' ('+fN(metaClicks)+' cliques)</span>';
+    h+='<span>&#128269; Google: '+fmt(gSpend)+' ('+fN(gClicks)+' cliques)</span>';
     h+='<span><strong>Total: '+fmt(adSpend)+'</strong></span>';
     h+='</div></div>';
   }
@@ -389,10 +389,10 @@ function render(){
     {l:'Leads/Msgs (Ads)',v:fN(adConversions),c:'#0d9488',w:adClicks>0?Math.max(12,adConversions/adClicks*90):65,x:'CPL: '+fmt(cpl)},
     {l:'Oportunidades (CRM)',v:fN(totalDeals),c:'#059669',w:55,x:paidDeals.length+' de trafego pago ('+pct(paidDeals.length,totalDeals)+')'},
     {l:'Responderam (MQL)',v:fN(pastSC),c:'#16a34a',w:totalDeals>0?Math.max(10,pastSC/totalDeals*55):45,x:pct(pastSC,totalDeals)+' taxa atendimento'},
-    {l:'Vendas',v:fN(vendidas.length),c:'#ca8a04',w:totalDeals>0?Math.max(8,vendidas.length/totalDeals*55):18,x:'TxC LeadsâVendas: '+pct(vendidas.length,totalDeals)},
+    {l:'Vendas',v:fN(vendidas.length),c:'#ca8a04',w:totalDeals>0?Math.max(8,vendidas.length/totalDeals*55):18,x:'TxC Leads&rarr;Vendas: '+pct(vendidas.length,totalDeals)},
     {l:'Faturamento',v:fmt(fat),c:'#ea580c',w:30,x:'Ticket: '+fmt(ticket)+' | ROAS: '+roas.toFixed(1)+'x'},
   ];
-  h+='<div class="sec"><h2>â¬ï¸ Funil Completo</h2><div class="funnel">';
+  h+='<div class="sec"><h2>&#11015;&#65039; Funil Completo</h2><div class="funnel">';
   steps.forEach(s=>{
     h+='<div class="f-step">';
     h+='<div class="f-bar" style="width:'+s.w+'%;background:'+s.c+'">'+s.v+'</div>';
@@ -402,7 +402,7 @@ function render(){
   h+='</div></div>';
 
   // Pie
-  h+='<div class="sec"><h2>ð Status dos Deals</h2>';
+  h+='<div class="sec"><h2>&#128202; Status dos Deals</h2>';
   h+='<canvas id="pieC"></canvas>';
   h+='<div style="margin-top:10px;font-size:12px;color:#6b7280;display:flex;gap:8px;flex-wrap:wrap">';
   h+='<span class="tag tg">Vendidas: '+vendidas.length+'</span>';
@@ -412,7 +412,7 @@ function render(){
   h+='</div>'; // grid-2
 
   // === PIPELINE STAGES ===
-  h+='<div class="sec"><h2>ð Pipeline â Etapas</h2>';
+  h+='<div class="sec"><h2>&#128260; Pipeline &mdash; Etapas</h2>';
   const etapaEntries=Object.entries(etapas).sort((a,b)=>b[1]-a[1]);
   if(etapaEntries.length>0){
     h+='<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">';
@@ -430,7 +430,7 @@ function render(){
   h+='</div>';
 
   // === ROAS POR UTM/CAMPANHA TABLE ===
-  h+='<div class="sec"><h2>ð ROAS por UTM / Campanha</h2>';
+  h+='<div class="sec"><h2>&#128200; ROAS por UTM / Campanha</h2>';
   const campBk={};
   fd.forEach(d=>{
     const utm=d.c?d.c.trim():'';
@@ -470,7 +470,7 @@ function render(){
   h+='</div>';
 
   // === ROAS POR SERVICO (summary table) ===
-  h+='<div class="sec"><h2>ð ROAS Comparativo por Servico</h2>';
+  h+='<div class="sec"><h2>&#127942; ROAS Comparativo por Servico</h2>';
   h+='<div style="overflow-x:auto"><table><thead><tr>';
   h+='<th>Servico</th><th>Investimento</th><th>Leads CRM</th><th>Vendas</th><th>TxC</th><th>Faturamento</th><th>ROAS</th><th>CAC</th><th>Ticket</th>';
   h+='</tr></thead><tbody>';
@@ -522,7 +522,7 @@ function render(){
 
   // === META ADS CAMPAIGNS DETAIL ===
   if(fa.length>0){
-    h+='<div class="sec"><h2>ð£ Campanhas Meta Ads â Detalhes</h2>';
+    h+='<div class="sec"><h2>&#128227; Campanhas Meta Ads &mdash; Detalhes</h2>';
     h+='<div style="overflow-x:auto"><table><thead><tr>';
     h+='<th>Campanha</th><th>Investimento</th><th>Cliques</th><th>Leads</th><th>Msgs</th><th>CPC</th><th>CPL</th><th>CTR</th><th>Alcance</th>';
     h+='</tr></thead><tbody>';
@@ -544,7 +544,7 @@ function render(){
 
   // === GOOGLE ADS CAMPAIGNS DETAIL ===
   if(fga.length>0){
-    h+='<div class="sec"><h2>ð Campanhas Google Ads â Detalhes</h2>';
+    h+='<div class="sec"><h2>&#128269; Campanhas Google Ads &mdash; Detalhes</h2>';
     h+='<div style="margin-bottom:10px;font-size:12px;color:#6b7280">'+fga.length+' campanhas | Investimento total: '+fmt(gSpend)+' | '+fN(gClicks)+' cliques | '+fN(gConversions)+' conversoes</div>';
     h+='<div style="overflow-x:auto"><table><thead><tr>';
     h+='<th>Campanha</th><th>Tipo</th><th>Investimento</th><th>Cliques</th><th>Impr.</th><th>Conv.</th><th>CPC</th><th>Taxa Conv.</th>';
@@ -567,7 +567,7 @@ function render(){
   }
 
   // === EVOLUCAO DIARIA (bar chart) ===
-  h+='<div class="sec"><h2>ð Evolucao Mensal â Investimento vs Faturamento</h2>';
+  h+='<div class="sec"><h2>&#128197; Evolucao Mensal &mdash; Investimento vs Faturamento</h2>';
   h+='<canvas id="barC" style="max-height:320px"></canvas>';
   h+='</div>';
 
