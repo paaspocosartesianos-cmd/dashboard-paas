@@ -165,7 +165,8 @@ const SVC_KW={
 };
 
 function mSvc(text,svc){
-  if(!text||svc==='TODOS')return true;
+  if(svc==='TODOS')return true;
+  if(!text||typeof text!=='string')return false;
   const t=text.toLowerCase();
   return(SVC_KW[svc]||[svc.toLowerCase()]).some(k=>t.includes(k));
 }
@@ -234,7 +235,7 @@ function inPeriod(dateStr){
 function getDeals(){
   return DEALS.filter(d=>{
     if(!inPeriod(d.dc))return false;
-    const svcM=mSvc(d.c,curSvc)||mSvc(d.fo,curSvc)||mSvc(d.f,curSvc)||mSvc(d.n,curSvc);
+    const svcM=mSvc(d.c||'',curSvc)||mSvc(d.fo||'',curSvc)||mSvc(d.f||'',curSvc)||mSvc(d.n||'',curSvc);
     if(!svcM)return false;
     if(curUtm&&(d.c||'').trim()!==curUtm)return false;
     if(curFonte&&(d.fo||'').trim()!==curFonte)return false;
