@@ -254,9 +254,32 @@ function getAds(){
 function getGoogleAds(){
   if(curPlat==='META')return[];
   const camps=GADS.campaigns||[];
-  return camps.filter(c=>{
+  const filtered=camps.filter(c=>{
     return c.cost>0&&mSvc(c.campaign_name,curSvc)&&mSearch(c.campaign_name);
   });
+  const ratio=gadsDateRatio();
+  if(ratio<1){
+    return filtered.map(c=>({...c,
+      cost:(c.cost||0)*ratio,
+      clicks:Math.round((c.clicks||0)*ratio),
+      impressions:Math.round((c.impressions||0)*ratio),
+      conversions:Math.round((c.conversions||0)*ratio)
+    }));
+  }
+  return filtered;
+}
+
+function gadsDateRatio(){
+  if(!dtStart||!dtEnd)return 1;
+  const dr=GADS.date_range||'';
+  if(!dr)return 1;
+  const parts=dr.split(' a ');
+  if(parts.length!==2)return 1;
+  const totalStart=new Date(parts[0].trim());
+  const totalEnd=new Date(parts[1].trim());
+  const totalDays=Math.max(1,(totalEnd-totalStart)/(86400000));
+  const selDays=Math.max(1,(dtEnd-dtStart)/(86400000));
+  return Math.min(1,selDays/totalDays);
 }
 
 function getAdsDaily(){
@@ -350,25 +373,29 @@ function render(){
   }
 
   // === PLATFORM BREAKDOWN BAR ===
+  const gRatio=gadsDateRatio();
+  const gEstimado=gRatio<1;
   if(curPlat==='TODOS'&&(metaSpend>0||gSpend>0)){
     const mPct=adSpend>0?(metaSpend/adSpend*100).toFixed(0):0;
     const gPct=adSpend>0?(gSpend/adSpend*100).toFixed(0):0;
     h+='<div style="background:#fff;border-radius:10px;padding:14px 18px;margin-bottom:16px;box-shadow:0 1px 3px rgba(0,0,0,.06)">';
-    h+='<div style="font-size:12px;font-weight:600;color:#6b7280;margin-bottom:8px">INVESTIMENTO POR PLATAFORMA</div>';
+    h+='<div style="font-size:12px;font-weight:600;color:#6b7280;margin-bottom:8px">INVESTIMENTO POR PLATAFORMA';
+    if(gEstimado)h+=' <span style="font-weight:400;color:#f59e0b;font-size:11px">(Google Ads estimado pro-rata para o periodo)</span>';
+    h+='</div>';
     h+='<div style="display:flex;height:28px;border-radius:6px;overflow:hidden;font-size:12px;font-weight:600;color:#fff">';
     if(metaSpend>0)h+='<div style="background:#1877f2;width:'+mPct+'%;display:flex;align-items:center;justify-content:center;min-width:60px" title="Meta Ads: '+fmt(metaSpend)+'">&#128216; Meta '+mPct+'%</div>';
     if(gSpend>0)h+='<div style="background:#ea4335;width:'+gPct+'%;display:flex;align-items:center;justify-content:center;min-width:60px" title="Google Ads: '+fmt(gSpend)+'">&#128269; Google '+gPct+'%</div>';
     h+='</div>';
     h+='<div style="display:flex;justify-content:space-between;margin-top:6px;font-size:11px;color:#6b7280">';
     h+='<span>&#128216; Meta: '+fmt(metaSpend)+' ('+fN(metaClicks)+' cliques)</span>';
-    h+='<span>&#128269; Google: '+fmt(gSpend)+' ('+fN(gClicks)+' cliques)</span>';
+    h+='<span>&#128269; Google: '+fmt(gSpend)+' ('+fN(gClicks)+' cliques)'+(gEstimado?' ~est.':'')+'</span>';
     h+='<span><strong>Total: '+fmt(adSpend)+'</strong></span>';
     h+='</div></div>';
   }
 
   // === KPIs ===
   h+='<div class="kpi-row">';
-  h+='<div class="kpi blue"><div class="lb">Investimento</div><div class="vl">'+fmt(adSpend)+'</div><div class="sb">'+platLabel+' no periodo</div></div>';
+  h+='<div class="kpi blue"><div class="lb">Investimento</div><div class="vl">'+fmt(adSpend)+'</div><div class="sb">'+platLabel+' no periodo'+(gEstimado?' (Google ~est.)':'')+' </div></div>';
   h+='<div class="kpi"><div class="lb">Conversoes Ads</div><div class="vl">'+fN(adConversions)+'</div><div class="sb">'+fN(adLeads)+' leads + '+fN(adMsgs)+' msgs</div></div>';
   h+='<div class="kpi"><div class="lb">Oportunidades</div><div class="vl">'+fN(totalDeals)+'</div><div class="sb">'+fN(paidDeals.length)+' de trafego pago</div></div>';
   h+='<div class="kpi"><div class="lb">Vendas</div><div class="vl">'+fN(vendidas.length)+'</div><div class="sb">TxC: '+txC.toFixed(1)+'%</div></div>';
@@ -524,7 +551,7 @@ function render(){
   if(fa.length>0){
     h+='<div class="sec"><h2>&#128227; Campanhas Meta Ads &mdash; Detalhes</h2>';
     h+='<div style="overflow-x:auto"><table><thead><tr>';
-    h+='<th>Campanha</th><th>Investimento</th><th>Cliques</th><th>Leads</th><th>Msgs</th><th>CPC</th><th>CPL</th><th>CTR</th><th>Alcance</th>';
+    h+='<th>Campanha</th><th>Investimento</th><th>Cliques</th><th>Leads</th><th>Msgs</th><th>CPC</th><th>CPL</th><th>CTR</th><th>Alcance</th><th>Faturamento</th><th>ROAS</th>';
     h+='</tr></thead><tbody>';
     fa.sort((a,b)=>b.spend-a.spend).forEach(c=>{
       h+='<tr>';
@@ -537,6 +564,13 @@ function render(){
       h+='<td>'+(c.cpl>0?fmt(c.cpl):'-')+'</td>';
       h+='<td>'+(c.ctr||0).toFixed(2)+'%</td>';
       h+='<td>'+fN(c.reach)+'</td>';
+      // Faturamento: match campaign name to deals UTM
+      const cDeals=fd.filter(d=>(d.c||'').toLowerCase().includes(c.campaign_name.split(']')[1]?(c.campaign_name.split(']')[1].trim().substring(0,8).toLowerCase()):(c.campaign_name.substring(0,8).toLowerCase())));
+      const cVendas=cDeals.filter(d=>d.e==='Vendida');
+      const cFat=cVendas.reduce((s,d)=>s+(d.v||0),0);
+      const cRoas=c.spend>0?cFat/c.spend:0;
+      h+='<td style="font-weight:600;color:#16a34a">'+fmt(cFat)+'</td>';
+      h+='<td style="font-weight:600;color:'+(cRoas>=3?'#16a34a':cRoas>=1?'#ea580c':'#dc2626')+'">'+cRoas.toFixed(1)+'x</td>';
       h+='</tr>';
     });
     h+='</tbody></table></div></div>';
@@ -547,7 +581,7 @@ function render(){
     h+='<div class="sec"><h2>&#128269; Campanhas Google Ads &mdash; Detalhes</h2>';
     h+='<div style="margin-bottom:10px;font-size:12px;color:#6b7280">'+fga.length+' campanhas | Investimento total: '+fmt(gSpend)+' | '+fN(gClicks)+' cliques | '+fN(gConversions)+' conversoes</div>';
     h+='<div style="overflow-x:auto"><table><thead><tr>';
-    h+='<th>Campanha</th><th>Tipo</th><th>Investimento</th><th>Cliques</th><th>Impr.</th><th>Conv.</th><th>CPC</th><th>Taxa Conv.</th>';
+    h+='<th>Campanha</th><th>Tipo</th><th>Investimento</th><th>Cliques</th><th>Impr.</th><th>Conv.</th><th>CPC</th><th>Taxa Conv.</th><th>Faturamento</th><th>ROAS</th>';
     h+='</tr></thead><tbody>';
     fga.sort((a,b)=>b.cost-a.cost).forEach(c=>{
       const gcpc=c.clicks>0?(c.cost/c.clicks):0;
@@ -561,6 +595,17 @@ function render(){
       h+='<td>'+fN(c.conversions)+'</td>';
       h+='<td>'+fmt(gcpc)+'</td>';
       h+='<td>'+(c.conv_rate||0).toFixed(1)+'%</td>';
+      // Faturamento: match Google campaign to deals
+      const gcn=c.campaign_name.replace(/\[.*?\]\s*/,'').substring(0,10).toLowerCase();
+      const gDeals=fd.filter(d=>{
+        const t=((d.c||'')+' '+(d.fo||'')+' '+(d.n||'')).toLowerCase();
+        return gcn.length>3&&t.includes(gcn.substring(0,6));
+      });
+      const gVendas=gDeals.filter(d=>d.e==='Vendida');
+      const gFat=gVendas.reduce((s,d)=>s+(d.v||0),0);
+      const gCRoas=c.cost>0?gFat/c.cost:0;
+      h+='<td style="font-weight:600;color:#16a34a">'+fmt(gFat)+'</td>';
+      h+='<td style="font-weight:600;color:'+(gCRoas>=3?'#16a34a':gCRoas>=1?'#ea580c':'#dc2626')+'">'+gCRoas.toFixed(1)+'x</td>';
       h+='</tr>';
     });
     h+='</tbody></table></div></div>';
@@ -637,7 +682,7 @@ function render(){
 // === EVENT LISTENERS ===
 document.querySelectorAll('.btn-svc').forEach(b=>{
   b.addEventListener('click',()=>{
-    document.querySelectorAll('.btn-svc').forEach(x=>x.classList.remove('active'));
+    document.querySelectorAll('#svcBtns .btn-svc').forEach(x=>x.classList.remove('active'));
     b.classList.add('active');
     curSvc=b.dataset.svc;
     render();
