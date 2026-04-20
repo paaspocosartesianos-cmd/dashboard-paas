@@ -160,6 +160,45 @@ const SVC_KW={
   'FILTRO':['filtro','filter','filtr'],
   'HIDRO':['hidro','hidropaas','hidropas'],
   'SONDAGEM':['sondagem','spt','geotec'],
+  'MONITORAMENTO':12px">Busca:</label>
+  <input type="text" id="searchInput" placeholder="Filtrar por palavra-chave...">
+  <label style="margin-left:12px">Fonte:</label>
+  <select id="fonteFilter">
+    <option value="">Todas as fontes</option>
+  </select>
+</div>
+
+<div class="period-row">
+  <label>Periodo:</label>
+  <input type="date" id="dtStart">
+  <span style="font-size:12px;color:#6b7280">ate</span>
+  <input type="date" id="dtEnd">
+  <div class="btn-group" style="margin-left:8px">
+    <button class="preset" data-days="30">30d</button>
+    <button class="preset" data-days="90">90d</button>
+    <button class="preset" data-days="180">6m</button>
+    <button class="preset active" data-days="365">1 ano</button>
+    <button class="preset" data-days="0">Tudo</button>
+  </div>
+</div>
+
+<div class="ct" id="content">
+  <div class="loading">Carregando dados do CRM, Meta Ads e Google Ads...</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+<script>
+const BASE='https://paaspocosartesianos-cmd.github.io/dashboard-paas/data/';
+let DEALS=[],ADS={},GADS={},curSvc='TODOS',curPlat='TODOS',search='',curUtm='',curFonte='',dtStart=null,dtEnd=null;
+let pieChart=null,barChart=null;
+
+const SVC_KW={
+  'POCO':['poco','po\u00e7o','well','artesian','litoral','artesiano'],
+  'OUTORGA':['outorga','grant','licen'],
+  'IRRIGACAO':['irriga','irrigation'],
+  'FILTRO':['filtro','filter','filtr'],
+  'HIDRO':['hidro','hidropaas','hidropas'],
+  'SONDAGEM':['sondagem','spt','geotec'],
   'MONITORAMENTO':['monitor','quali','monit'],
   'WHATSAPP':['whatsapp','whats','wpp','engajamento']
 };
@@ -184,6 +223,7 @@ function isPaidSource(d){
   if(fo.includes('contato por telefone')||fo.includes('contato por e-mail'))return false;
   if(fo.includes('social | instagram')&&!fo.includes('pag'))return false;
   if(fo.includes('busca paga')||fo.includes('pag')||fo.includes('googleads')||fo.includes('facebook'))return true;
+  if(c&&c.includes('trafego direto'))return false;
   if(c&&(c.includes('cadastro')||c.includes('trafego')||c.includes('lead')||c.includes('engajamento')))return true;
   if(fo.includes('redes sociais'))return false;
   if(fo.includes('referÃªncia'))return false;
@@ -267,9 +307,29 @@ function getDeals(){
 
 function getAds(){
   if(curPlat==='GOOGLE')return[];
-  const camps=ADS.campaigns||[];
-  return camps.filter(c=>{
-    return mSvc(c.campaign_name,curSvc)&&mSearch(c.campaign_name);
+  // Aggregate daily data by campaign (period-filtered) instead of using all-time ADS.campaigns
+  const daily=ADS.campaign_daily||[];
+  const campMap={};
+  daily.forEach(d=>{
+    if(dtStart&&dtEnd){const dd=parseD(d.date);if(dd&&(dd<dtStart||dd>dtEnd))return}
+    const n=d.campaign_name;
+    if(!mSvc(n,curSvc)||!mSearch(n))return;
+    if(!campMap[n])campMap[n]={campaign_name:n,spend:0,clicks:0,impressions:0,leads:0,messages:0,reach:0,cpc:0,cpl:0,ctr:0,landing_page_views:0,link_clicks:0};
+    campMap[n].spend+=(d.spend||0);
+    campMap[n].clicks+=(d.clicks||0);
+    campMap[n].impressions+=(d.impressions||0);
+    campMap[n].leads+=(d.leads||0);
+    campMap[n].messages+=(d.messages||0);
+    campMap[n].reach+=(d.reach||0);
+    campMap[n].landing_page_views+=(d.landing_page_views||0);
+    campMap[n].link_clicks+=(d.link_clicks||0);
+  });
+  // Calculate derived metrics
+  return Object.values(campMap).map(c=>{
+    c.cpc=c.clicks>0?c.spend/c.clicks:0;
+    c.cpl=(c.leads+c.messages)>0?c.spend/(c.leads+c.messages):0;
+    c.ctr=c.impressions>0?(c.clicks/c.impressions*100):0;
+    return c;
   });
 }
 
@@ -359,7 +419,6 @@ function render(){
 
   // === CRM METRICS ===
   const totalDeals=fd.length;
-  const paidDeals=fd.filter(d=>(d.fo||'').toLowerCase().includes('pag'));
   const vendidas=fd.filter(d=>d.e==='Vendida');
   const perdidas=fd.filter(d=>d.e==='Perdida');
   const emAnd=fd.filter(d=>d.e==='Em Andamento');
@@ -651,7 +710,7 @@ function render(){
   }
 
   // === EVOLUCAO DIARIA (bar chart) ===
-  h+='<div class="sec"><h2>&#128197; Evolucao Mensal &mdash; Investimento vs Faturamento</h2>';
+  h+='<div class="sec"><h2>&#128197; Evolucao Mensal &mdash; Investimento vs Faturamento (Total e Pago)</h2>';
   h+='<canvas id="barC" style="max-height:320px"></canvas>';
   h+='</div>';
 
@@ -679,16 +738,16 @@ function render(){
         const dt=parseD(d.dc);
         if(!dt)return;
         const mk=dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0');
-        if(!months[mk])months[mk]={invest:0,fat:0,vendas:0,leads:0};
+        if(!months[mk])months[mk]={invest:0,fat:0,fatPago:0,vendas:0,leads:0};
         months[mk].leads++;
-        if(d.e==='Vendida'){months[mk].vendas++;months[mk].fat+=(d.v||0)}
+        if(d.e==='Vendida'){months[mk].vendas++;months[mk].fat+=(d.v||0);if(isPaidSource(d))months[mk].fatPago+=(d.v||0)}
       });
       // Add ads spend by month
       fad.forEach(d=>{
         const dt=parseD(d.date);
         if(!dt)return;
         const mk=dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0');
-        if(!months[mk])months[mk]={invest:0,fat:0,vendas:0,leads:0};
+        if(!months[mk])months[mk]={invest:0,fat:0,fatPago:0,vendas:0,leads:0};
         months[mk].invest+=(d.spend||0);
       });
       const mKeys=Object.keys(months).sort();
@@ -699,8 +758,9 @@ function render(){
         data:{
           labels:mLabels,
           datasets:[
-            {label:'Investimento',data:mKeys.map(k=>months[k].invest),backgroundColor:'#065a82',borderRadius:4,order:2},
-            {label:'Faturamento',data:mKeys.map(k=>months[k].fat),backgroundColor:'#16a34a',borderRadius:4,order:1},
+            {label:'Investimento',data:mKeys.map(k=>months[k].invest),backgroundColor:'#065a82',borderRadius:4,order:3},
+            {label:'Fat. Trafego Pago',data:mKeys.map(k=>months[k].fatPago),backgroundColor:'#ea580c',borderRadius:4,order:2},
+            {label:'Fat. Total',data:mKeys.map(k=>months[k].fat),backgroundColor:'#16a34a',borderRadius:4,order:1},
           ]
         },
         options:{
