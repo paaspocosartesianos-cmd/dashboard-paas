@@ -169,6 +169,10 @@ function mSvc(text,svc){
   if(!text||typeof text!=='string')return false;
   try{const t=text.toLowerCase();return(SVC_KW[svc]||[svc.toLowerCase()]).some(k=>t.includes(k));}catch(e){return false;}
 }
+function detectCampSvc(name){
+  for(const svc of Object.keys(SVC_KW)){if(mSvc(name,svc))return svc;}
+  return 'OTHER';
+}
 function mSearch(text){
   if(!search)return true;
   return(text||'').toLowerCase().includes(search.toLowerCase());
@@ -548,17 +552,29 @@ function render(){
   });
   h+='</tbody></table></div></div>';
 
+  // === PRO-RATA SERVICE ATTRIBUTION for campaign-level Faturamento ===
+  const svcTotals={};
+  fa.forEach(c=>{const svc=detectCampSvc(c.campaign_name);if(!svcTotals[svc])svcTotals[svc]={metaSpend:0,googleSpend:0,fat:0,vendas:0};svcTotals[svc].metaSpend+=c.spend;});
+  fga.forEach(c=>{const svc=detectCampSvc(c.campaign_name);if(!svcTotals[svc])svcTotals[svc]={metaSpend:0,googleSpend:0,fat:0,vendas:0};svcTotals[svc].googleSpend+=c.cost;});
+  Object.keys(svcTotals).forEach(svc=>{
+    const sDeals=fd.filter(d=>mSvc(d.c||'',svc)||mSvc(d.fo||'',svc)||mSvc(d.f||'',svc)||mSvc(d.n||'',svc));
+    const sV=sDeals.filter(d=>d.e==='Vendida');
+    svcTotals[svc].fat=sV.reduce((s,d)=>s+(d.v||0),0);
+    svcTotals[svc].vendas=sV.length;
+  });
+
   // === META ADS CAMPAIGNS DETAIL ===
   if(fa.length>0){
     h+='<div class="sec"><h2>&#128227; Campanhas Meta Ads &mdash; Detalhes</h2>';
+    h+='<div style="margin-bottom:8px;font-size:11px;color:#6b7280;background:#f0f9ff;padding:6px 10px;border-radius:6px;border:1px solid #bae6fd">&#9432; Fat. Atribu&#237;do = faturamento do servi&#231;o distribu&#237;do proporcionalmente ao investimento de cada campanha (evita dupla contagem)</div>';
     h+='<div style="overflow-x:auto"><table><thead><tr>';
-    h+='<th>Campanha</th><th>Investimento</th><th>Cliques</th><th>Leads</th><th>Msgs</th><th>CPC</th><th>CPL</th><th>CTR</th><th>Alcance</th><th>Faturamento</th><th>ROAS</th>';
+    h+='<th>Campanha</th><th>Investimento</th><th>Cliques</th><th>Leads</th><th>Msgs</th><th>CPC</th><th>CPL</th><th>CTR</th><th>Alcance</th><th>Fat. Atribu&#237;do</th><th>ROAS</th>';
     h+='</tr></thead><tbody>';
     fa.sort((a,b)=>b.spend-a.spend).forEach(c=>{
-      const cKey=c.campaign_name.split(']')[1]?(c.campaign_name.split(']')[1].trim().substring(0,8).toLowerCase()):(c.campaign_name.substring(0,8).toLowerCase());
-      const cDeals=fd.filter(d=>(d.c||'').toLowerCase().includes(cKey));
-      const cVendas=cDeals.filter(d=>d.e==='Vendida');
-      const cFat=cVendas.reduce((s,d)=>s+(d.v||0),0);
+      const svc=detectCampSvc(c.campaign_name);
+      const st=svcTotals[svc]||{metaSpend:0,googleSpend:0,fat:0,vendas:0};
+      const totalSvcSpend=st.metaSpend+st.googleSpend;
+      const cFat=totalSvcSpend>0?st.fat*(c.spend/totalSvcSpend):0;
       const cRoas=c.spend>0?cFat/c.spend:0;
       h+='<tr>';
       h+='<td><strong>'+c.campaign_name+'</strong></td>';
@@ -580,17 +596,18 @@ function render(){
   // === GOOGLE ADS CAMPAIGNS DETAIL ===
   if(fga.length>0){
     h+='<div class="sec"><h2>&#128269; Campanhas Google Ads &mdash; Detalhes</h2>';
-    h+='<div style="margin-bottom:10px;font-size:12px;color:#6b7280">'+fga.length+' campanhas | Investimento total: '+fmt(gSpend)+' | '+fN(gClicks)+' cliques | '+fN(gConversions)+' conversoes</div>';
+    h+='<div style="margin-bottom:8px;font-size:12px;color:#6b7280">'+fga.length+' campanhas | Investimento total: '+fmt(gSpend)+' | '+fN(gClicks)+' cliques | '+fN(gConversions)+' conversoes</div>';
+    h+='<div style="margin-bottom:8px;font-size:11px;color:#6b7280;background:#f0f9ff;padding:6px 10px;border-radius:6px;border:1px solid #bae6fd">&#9432; Fat. Atribu&#237;do = faturamento do servi&#231;o distribu&#237;do proporcionalmente ao investimento de cada campanha (evita dupla contagem)</div>';
     h+='<div style="overflow-x:auto"><table><thead><tr>';
-    h+='<th>Campanha</th><th>Tipo</th><th>Investimento</th><th>Cliques</th><th>Impr.</th><th>Conv.</th><th>CPC</th><th>Taxa Conv.</th><th>Faturamento</th><th>ROAS</th>';
+    h+='<th>Campanha</th><th>Tipo</th><th>Investimento</th><th>Cliques</th><th>Impr.</th><th>Conv.</th><th>CPC</th><th>Taxa Conv.</th><th>Fat. Atribu&#237;do</th><th>ROAS</th>';
     h+='</tr></thead><tbody>';
     fga.sort((a,b)=>b.cost-a.cost).forEach(c=>{
       const gcpc=c.clicks>0?(c.cost/c.clicks):0;
       const typeTag=c.campaign_type==='Performance Max'?'to':c.campaign_type==='Pesquisa'?'tb':'tg';
-      const gcn=c.campaign_name.replace(/\[.*?\]\s*/,'').substring(0,10).toLowerCase();
-      const gDeals=fd.filter(d=>{const t=((d.c||'')+' '+(d.fo||'')+' '+(d.n||'')).toLowerCase();return gcn.length>3&&t.includes(gcn.substring(0,6));});
-      const gVendas=gDeals.filter(d=>d.e==='Vendida');
-      const gFat=gVendas.reduce((s,d)=>s+(d.v||0),0);
+      const svc=detectCampSvc(c.campaign_name);
+      const st=svcTotals[svc]||{metaSpend:0,googleSpend:0,fat:0,vendas:0};
+      const totalSvcSpend=st.metaSpend+st.googleSpend;
+      const gFat=totalSvcSpend>0?st.fat*(c.cost/totalSvcSpend):0;
       const gCRoas=c.cost>0?gFat/c.cost:0;
       h+='<tr>';
       h+='<td><strong>'+c.campaign_name+'</strong></td>';
