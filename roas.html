@@ -160,45 +160,6 @@ const SVC_KW={
   'FILTRO':['filtro','filter','filtr'],
   'HIDRO':['hidro','hidropaas','hidropas'],
   'SONDAGEM':['sondagem','spt','geotec'],
-  'MONITORAMENTO':12px">Busca:</label>
-  <input type="text" id="searchInput" placeholder="Filtrar por palavra-chave...">
-  <label style="margin-left:12px">Fonte:</label>
-  <select id="fonteFilter">
-    <option value="">Todas as fontes</option>
-  </select>
-</div>
-
-<div class="period-row">
-  <label>Periodo:</label>
-  <input type="date" id="dtStart">
-  <span style="font-size:12px;color:#6b7280">ate</span>
-  <input type="date" id="dtEnd">
-  <div class="btn-group" style="margin-left:8px">
-    <button class="preset" data-days="30">30d</button>
-    <button class="preset" data-days="90">90d</button>
-    <button class="preset" data-days="180">6m</button>
-    <button class="preset active" data-days="365">1 ano</button>
-    <button class="preset" data-days="0">Tudo</button>
-  </div>
-</div>
-
-<div class="ct" id="content">
-  <div class="loading">Carregando dados do CRM, Meta Ads e Google Ads...</div>
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
-<script>
-const BASE='https://paaspocosartesianos-cmd.github.io/dashboard-paas/data/';
-let DEALS=[],ADS={},GADS={},curSvc='TODOS',curPlat='TODOS',search='',curUtm='',curFonte='',dtStart=null,dtEnd=null;
-let pieChart=null,barChart=null;
-
-const SVC_KW={
-  'POCO':['poco','po\u00e7o','well','artesian','litoral','artesiano'],
-  'OUTORGA':['outorga','grant','licen'],
-  'IRRIGACAO':['irriga','irrigation'],
-  'FILTRO':['filtro','filter','filtr'],
-  'HIDRO':['hidro','hidropaas','hidropas'],
-  'SONDAGEM':['sondagem','spt','geotec'],
   'MONITORAMENTO':['monitor','quali','monit'],
   'WHATSAPP':['whatsapp','whats','wpp','engajamento']
 };
@@ -214,21 +175,12 @@ function detectCampSvc(name){
 }
 function isPaidSource(d){
   const fo=(d.fo||'').toLowerCase();
-  const c=(d.c||'').toLowerCase();
-  if(fo.includes('recorrente')||fo.includes('cliente recorrente'))return false;
-  if(fo.includes('orgÃ¢nic')||fo.includes('organico')||fo.includes('whatsapp org'))return false;
-  if(fo.includes('indicaÃ§Ã£o')||fo.includes('indica')||fo==='ligaÃ§Ã£o')return false;
-  if(fo.includes('trÃ¡fego direto')||fo.includes('presencial')||fo.includes('visita'))return false;
-  if(fo.includes('prospecÃ§Ã£o')||fo.includes('cliente presencial'))return false;
-  if(fo.includes('contato por telefone')||fo.includes('contato por e-mail'))return false;
-  if(fo.includes('social | instagram')&&!fo.includes('pag'))return false;
-  if(fo.includes('busca paga')||fo.includes('pag')||fo.includes('googleads')||fo.includes('facebook'))return true;
-  if(c&&c.includes('trafego direto'))return false;
-  if(c&&(c.includes('cadastro')||c.includes('trafego')||c.includes('lead')||c.includes('engajamento')))return true;
-  if(fo.includes('redes sociais'))return false;
-  if(fo.includes('referÃªncia'))return false;
-  if(!fo||fo==='desconhecido'||fo==='(vazio)')return false;
-  if(fo.includes('email |'))return false;
+  const ca=(d.c||'').toLowerCase();
+  /* Regra 1: Fonte com "Busca Paga" â sempre PAGO */
+  if(fo.includes('busca paga'))return true;
+  /* Regra 2: Campanha com indicador de plataforma de ads â PAGO */
+  if(ca&&(ca.includes('[facebook]')||ca.includes('[ facebook]')||ca.includes('[google]')||ca.includes('meta ads')||ca.includes('facebook ads')||ca.includes('google ads')))return true;
+  /* Tudo mais â NÃO pago */
   return false;
 }
 function mSearch(text){
