@@ -184,6 +184,17 @@ function isPaidSource(d){
   /* Tudo mais â NÃO pago */
   return false;
 }
+function dealPlatform(d){
+  const ca=(d.c||'').toLowerCase();
+  const fo=(d.fo||'').toLowerCase();
+  if(ca.includes('[facebook]')||ca.includes('[ facebook]')||ca.includes('meta ads')||ca.includes('facebook ads'))return 'META';
+  if(ca.includes('[google]')||ca.includes('google ads')||fo.includes('busca paga'))return 'GOOGLE';
+  return 'NONE';
+}
+function dealMatchesPlat(d){
+  if(curPlat==='TODOS')return true;
+  return dealPlatform(d)===curPlat;
+}
 function mSearch(text){
   if(!search)return true;
   return(text||'').toLowerCase().includes(search.toLowerCase());
@@ -253,6 +264,7 @@ function getDeals(){
     if(!svcM)return false;
     if(curUtm&&(d.c||'').trim()!==curUtm)return false;
     if(curFonte&&(d.fo||'').trim()!==curFonte)return false;
+    if(!dealMatchesPlat(d))return false;
     const searchM=mSearch(d.c)||mSearch(d.fo)||mSearch(d.n)||mSearch(d.f);
     return searchM;
   });
