@@ -187,8 +187,14 @@ function isPaidSource(d){
 function dealPlatform(d){
   const ca=(d.c||'').toLowerCase();
   const fo=(d.fo||'').toLowerCase();
-  if(ca.includes('[facebook]')||ca.includes('[ facebook]')||ca.includes('meta ads')||ca.includes('facebook ads'))return 'META';
-  if(ca.includes('[google]')||ca.includes('google ads')||fo.includes('busca paga'))return 'GOOGLE';
+  if(ca.includes('[facebook]')||ca.includes('[ facebook]'))return 'META';
+  if(ca.includes('[google]'))return 'GOOGLE';
+  if(ca.includes('facebook')||ca.includes('meta ads'))return 'META';
+  if(fo.includes('facebook'))return 'META';
+  if((fo.includes('instagram')||/social.*ig/.test(fo))&&fo.includes('busca paga'))return 'META';
+  if(fo.includes('google')||fo.includes('googleads'))return 'GOOGLE';
+  if(ca.includes('whatsapp')&&isPaidSource(d))return 'META';
+  if(ca.includes('google ads'))return 'GOOGLE';
   return 'NONE';
 }
 function dealMatchesPlat(d){
