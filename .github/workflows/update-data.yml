@@ -34,7 +34,7 @@ jobs:
         run: python fetch_ads.py
         continue-on-error: true
 
-      - name: Move ads data to data folder
+      - name: Move Meta ads data to data folder
         run: |
           if [ -f ads_data.json ]; then
             mv ads_data.json data/ads_data.json
@@ -44,14 +44,35 @@ jobs:
           fi
         continue-on-error: true
 
+      - name: Fetch Google Ads data
+        env:
+          GOOGLE_ADS_CLIENT_ID: ${{ secrets.GOOGLE_ADS_CLIENT_ID }}
+          GOOGLE_ADS_CLIENT_SECRET: ${{ secrets.GOOGLE_ADS_CLIENT_SECRET }}
+          GOOGLE_ADS_REFRESH_TOKEN: ${{ secrets.GOOGLE_ADS_REFRESH_TOKEN }}
+          GOOGLE_ADS_DEVELOPER_TOKEN: ${{ secrets.GOOGLE_ADS_DEVELOPER_TOKEN }}
+          GOOGLE_ADS_CUSTOMER_ID: ${{ secrets.GOOGLE_ADS_CUSTOMER_ID }}
+          GOOGLE_ADS_LOGIN_CUSTOMER_ID: ${{ secrets.GOOGLE_ADS_LOGIN_CUSTOMER_ID }}
+        run: python fetch_google_ads.py
+        continue-on-error: true
+
+      - name: Move Google ads data to data folder
+        run: |
+          if [ -f google_ads_data.json ]; then
+            mv google_ads_data.json data/google_ads_data.json
+            echo "google_ads_data.json moved to data/"
+          else
+            echo "google_ads_data.json not generated, keeping existing"
+          fi
+        continue-on-error: true
+
       - name: Commit and push updated data
         run: |
           git config user.name "GitHub Actions Bot"
           git config user.email "actions@github.com"
-          git add data/deals.json data/meta.json data/ads_data.json
+          git add data/deals.json data/meta.json data/ads_data.json data/google_ads_data.json
           if git diff --staged --quiet; then
             echo "No changes to commit"
           else
-            git commit -m "Auto-update: fetch latest CRM + Ads data $(date +'%Y-%m-%d %H:%M')"
+            git commit -m "Auto-update: fetch latest CRM + Meta Ads + Google Ads data $(date +'%Y-%m-%d %H:%M')"
             git push
           fi
