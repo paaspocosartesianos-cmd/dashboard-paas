@@ -105,8 +105,8 @@ canvas{max-height:280px}
     <button class="btn-svc" data-svc="FILTRO">Filtro</button>
     <button class="btn-svc" data-svc="HIDRO">HidroPAAS</button>
     <button class="btn-svc" data-svc="SONDAGEM">Sondagem SPT</button>
+    <button class="btn-svc" data-svc="MANUTENCAO">Manutenção</button>
     <button class="btn-svc" data-svc="MONITORAMENTO">Monitoramento</button>
-    <button class="btn-svc" data-svc="WHATSAPP">WhatsApp</button>
   </div>
 </div>
 
@@ -161,8 +161,8 @@ const SVC_KW={
   'FILTRO':['filtro','filter','filtr'],
   'HIDRO':['hidro','hidropaas','hidropas'],
   'SONDAGEM':['sondagem','spt','geotec'],
-  'MONITORAMENTO':['monitor','quali','monit'],
-  'WHATSAPP':['whatsapp','whats','wpp','engajamento']
+  'MANUTENCAO':['manuten','manutenção','manutencao'],
+  'MONITORAMENTO':['monitor','quali','monit','análise de água','analise de agua']
 };
 
 function mSvc(text,svc){
@@ -558,8 +558,8 @@ function render(){
   h+='<div style="overflow-x:auto"><table><thead><tr>';
   h+='<th>Servico</th><th>Investimento</th><th>Leads CRM</th><th>Vendas</th><th>TxC</th><th>Fat. Total</th><th>Fat. Pago</th><th>ROAS</th><th>CAC</th><th>Ticket</th>';
   h+='</tr></thead><tbody>';
-  const svcs=['POCO','OUTORGA','IRRIGACAO','FILTRO','HIDRO','SONDAGEM','MONITORAMENTO','WHATSAPP'];
-  const svcNames={'POCO':'Poco Artesiano','OUTORGA':'Outorga','IRRIGACAO':'Irrigacao','FILTRO':'Filtro','HIDRO':'HidroPAAS','SONDAGEM':'Sondagem SPT','MONITORAMENTO':'Monitoramento','WHATSAPP':'WhatsApp'};
+  const svcs=['POCO','OUTORGA','IRRIGACAO','FILTRO','HIDRO','SONDAGEM','MANUTENCAO','MONITORAMENTO'];
+  const svcNames={'POCO':'Poco Artesiano','OUTORGA':'Outorga','IRRIGACAO':'Irrigacao','FILTRO':'Filtro','HIDRO':'HidroPAAS','SONDAGEM':'Sondagem SPT','MANUTENCAO':'Manutenção','MONITORAMENTO':'Monitoramento'};
   svcs.forEach(svc=>{
     // Meta Ads spend for this service
     let sSpend=0;
