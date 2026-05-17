@@ -88,6 +88,7 @@ canvas{max-height:280px}
   <div>
     <h1>&#128202; ROAS &amp; Funil por Servico / UTM</h1>
     <div style="font-size:12px;opacity:.7;margin-top:3px">PAAS Pocos Artesianos &mdash; Meta Ads + Google Ads + CRM</div>
+    <div id="dataStatus" style="font-size:10px;opacity:.6;margin-top:2px"></div>
   </div>
   <div style="display:flex;gap:10px;align-items:center">
     <a href="index.html" class="nav-link">&larr; Dashboard Principal</a>
@@ -223,6 +224,20 @@ async function loadData(){
       fetch(BASE+'google_ads_data.json').then(r=>r.json()).catch(()=>({campaigns:[],totals:{}}))
     ]);
     DEALS=dr;ADS=ar;GADS=gr;
+    // Data source status
+    const metaOk=(ADS.meta||{}).token_status==='valid';
+    const gadsLive=gadsHasDaily();
+    const gadsCred=(GADS.meta||{}).credentials_status==='valid';
+    const dsEl=document.getElementById('dataStatus');
+    if(dsEl){
+      const st=[];
+      st.push(metaOk?'&#9989; Meta Ads ao vivo':'&#9888;&#65039; Meta Ads (token expirado)');
+      st.push(gadsLive?'&#9989; Google Ads ao vivo':'&#128312; Google Ads (dados estaticos, pro-rata)');
+      st.push('&#9989; CRM RD Station ao vivo');
+      const updated=GADS.last_updated||(GADS.meta||{}).fetched_at||'';
+      if(updated)st.push('Atualizado: '+updated.split('T')[0]);
+      dsEl.innerHTML=st.join(' | ');
+    }
     // Set default period: 1 year ago
     const now=new Date();
     dtEnd=new Date(now);
@@ -309,13 +324,47 @@ function getAds(){
   });
 }
 
+function gadsHasDaily(){return(GADS.campaign_daily||[]).length>0;}
+
+function getGoogleAdsDaily(){
+  if(curPlat==='META')return[];
+  const daily=GADS.campaign_daily||[];
+  if(!daily.length)return[];
+  return daily.filter(d=>{
+    if(!d.cost||d.cost<=0)return false;
+    if(!mSvc(d.campaign_name,curSvc))return false;
+    if(!mSearch(d.campaign_name))return false;
+    if(dtStart&&dtEnd){
+      const dd=parseD(d.date);
+      if(dd&&(dd<dtStart||dd>dtEnd))return false;
+    }
+    return true;
+  });
+}
+
 function getGoogleAds(){
   if(curPlat==='META')return[];
+  // Se temos dados diarios, agregar por campanha (dados exatos, sem pro-rata)
+  if(gadsHasDaily()){
+    const gd=getGoogleAdsDaily();
+    const campMap={};
+    gd.forEach(d=>{
+      const key=d.campaign_name||d.campaign_id;
+      if(!campMap[key])campMap[key]={campaign_name:d.campaign_name,campaign_id:d.campaign_id,campaign_type:d.campaign_type||'',status:d.status||'',cost:0,clicks:0,impressions:0,conversions:0};
+      campMap[key].cost+=d.cost||0;
+      campMap[key].clicks+=d.clicks||0;
+      campMap[key].impressions+=d.impressions||0;
+      campMap[key].conversions+=d.conversions||0;
+    });
+    const camps=Object.values(campMap);
+    camps.forEach(c=>{c.conv_rate=c.clicks>0?c.conversions/c.clicks*100:0;});
+    return camps;
+  }
+  // Fallback: dados estaticos all-time com pro-rata
   const camps=GADS.campaigns||[];
   const filtered=camps.filter(c=>{
     return c.cost>0&&mSvc(c.campaign_name,curSvc)&&mSearch(c.campaign_name);
   });
-  // Pro-rata: Google Ads data is all-time totals, so scale by selected period
   const ratio=gadsDateRatio();
   if(ratio<1){
     return filtered.map(c=>({...c,
@@ -329,6 +378,7 @@ function getGoogleAds(){
 }
 
 function gadsDateRatio(){
+  if(gadsHasDaily())return 1; // Dados diarios: sem pro-rata
   if(!dtStart||!dtEnd)return 1;
   const dr=GADS.date_range||'';
   if(!dr)return 1;
@@ -435,7 +485,7 @@ function render(){
 
   // === PLATFORM BREAKDOWN BAR ===
   const gRatio=gadsDateRatio();
-  const gEstimado=gRatio<1;
+  const gEstimado=!gadsHasDaily()&&gRatio<1;
   if(curPlat==='TODOS'&&(metaSpend>0||gSpend>0)){
     const mPct=adSpend>0?(metaSpend/adSpend*100).toFixed(0):0;
     const gPct=adSpend>0?(gSpend/adSpend*100).toFixed(0):0;
@@ -578,8 +628,18 @@ function render(){
     }
     // Google Ads spend for this service
     if(curPlat!=='META'){
-      const sGads=(GADS.campaigns||[]).filter(c=>c.cost>0&&mSvc(c.campaign_name,svc));
-      sSpend+=sGads.reduce((s,c)=>s+(c.cost||0),0)*gadsDateRatio();
+      if(gadsHasDaily()){
+        const sGads=(GADS.campaign_daily||[]).filter(d=>{
+          if(!d.cost||d.cost<=0)return false;
+          if(!mSvc(d.campaign_name,svc))return false;
+          if(dtStart&&dtEnd){const dd=parseD(d.date);if(dd&&(dd<dtStart||dd>dtEnd))return false}
+          return true;
+        });
+        sSpend+=sGads.reduce((s,d)=>s+(d.cost||0),0);
+      } else {
+        const sGads=(GADS.campaigns||[]).filter(c=>c.cost>0&&mSvc(c.campaign_name,svc));
+        sSpend+=sGads.reduce((s,c)=>s+(c.cost||0),0)*gadsDateRatio();
+      }
     }
     // CRM deals for this service
     const sDeals=DEALS.filter(d=>{
