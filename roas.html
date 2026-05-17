@@ -105,7 +105,7 @@ canvas{max-height:280px}
     <button class="btn-svc" data-svc="FILTRO">Filtro</button>
     <button class="btn-svc" data-svc="HIDRO">HidroPAAS</button>
     <button class="btn-svc" data-svc="SONDAGEM">Sondagem SPT</button>
-    <button class="btn-svc" data-svc="MANUTENCAO">Manutenção</button>
+    <button class="btn-svc" data-svc="MANUTENCAO">ManutenÃ§Ã£o</button>
     <button class="btn-svc" data-svc="MONITORAMENTO">Monitoramento</button>
   </div>
 </div>
@@ -135,7 +135,7 @@ canvas{max-height:280px}
   <span style="font-size:12px;color:#6b7280">ate</span>
   <input type="date" id="dtEnd">
   <div class="btn-group" style="margin-left:8px">
-    <button class="preset" data-days="mes">Mês atual</button>
+    <button class="preset" data-days="mes">MÃªs atual</button>
     <button class="preset" data-days="30">30d</button>
     <button class="preset" data-days="90">90d</button>
     <button class="preset" data-days="180">6m</button>
@@ -161,8 +161,8 @@ const SVC_KW={
   'FILTRO':['filtro','filter','filtr'],
   'HIDRO':['hidro','hidropaas','hidropas'],
   'SONDAGEM':['sondagem','spt','geotec'],
-  'MANUTENCAO':['manuten','manutenção','manutencao'],
-  'MONITORAMENTO':['monitor','quali','monit','análise de água','analise de agua']
+  'MANUTENCAO':['manuten','manuten\u00e7\u00e3o','manutencao'],
+  'MONITORAMENTO':['monitor','quali','monit','an\u00e1lise de \u00e1gua','analise de agua']
 };
 
 function mSvc(text,svc){
@@ -187,13 +187,18 @@ function isPaidSource(d){
 function dealPlatform(d){
   const ca=(d.c||'').toLowerCase();
   const fo=(d.fo||'').toLowerCase();
+  /* 1. Tag [FACEBOOK] ou [GOOGLE] na campanha â prioridade mÃ¡xima */
   if(ca.includes('[facebook]')||ca.includes('[ facebook]'))return 'META';
   if(ca.includes('[google]'))return 'GOOGLE';
+  /* 2. Nome da campanha contÃ©m facebook/meta â META */
   if(ca.includes('facebook')||ca.includes('meta ads'))return 'META';
+  /* 3. Fonte (fo) â verificar plataforma especÃ­fica */
   if(fo.includes('facebook'))return 'META';
   if((fo.includes('instagram')||/social.*ig/.test(fo))&&fo.includes('busca paga'))return 'META';
   if(fo.includes('google')||fo.includes('googleads'))return 'GOOGLE';
+  /* 4. Campanha WhatsApp Pago â META (WhatsApp ads rodam no Meta) */
   if(ca.includes('whatsapp')&&isPaidSource(d))return 'META';
+  /* 5. google ads no nome da campanha */
   if(ca.includes('google ads'))return 'GOOGLE';
   return 'NONE';
 }
@@ -559,7 +564,7 @@ function render(){
   h+='<th>Servico</th><th>Investimento</th><th>Leads CRM</th><th>Vendas</th><th>TxC</th><th>Fat. Total</th><th>Fat. Pago</th><th>ROAS</th><th>CAC</th><th>Ticket</th>';
   h+='</tr></thead><tbody>';
   const svcs=['POCO','OUTORGA','IRRIGACAO','FILTRO','HIDRO','SONDAGEM','MANUTENCAO','MONITORAMENTO'];
-  const svcNames={'POCO':'Poco Artesiano','OUTORGA':'Outorga','IRRIGACAO':'Irrigacao','FILTRO':'Filtro','HIDRO':'HidroPAAS','SONDAGEM':'Sondagem SPT','MANUTENCAO':'Manutenção','MONITORAMENTO':'Monitoramento'};
+  const svcNames={'POCO':'Poco Artesiano','OUTORGA':'Outorga','IRRIGACAO':'Irrigacao','FILTRO':'Filtro','HIDRO':'HidroPAAS','SONDAGEM':'Sondagem SPT','MANUTENCAO':'ManutenÃ§Ã£o','MONITORAMENTO':'Monitoramento'};
   svcs.forEach(svc=>{
     // Meta Ads spend for this service
     let sSpend=0;
@@ -605,6 +610,32 @@ function render(){
     h+='<td>'+fmt(sTk)+'</td>';
     h+='</tr>';
   });
+  // === OUTROS: deals que nÃ£o casam com nenhum serviÃ§o ===
+  const outrosDeals=DEALS.filter(d=>{
+    if(!inPeriod(d.dc))return false;
+    const txt=[d.c||'',d.fo||'',d.f||'',d.n||''].join(' ');
+    return !svcs.some(sv=>mSvc(txt,sv));
+  });
+  if(outrosDeals.length>0){
+    const oVendas=outrosDeals.filter(d=>d.e==='Vendida');
+    const oPaid=oVendas.filter(d=>isPaidSource(d));
+    const oFat=oVendas.reduce((s,d)=>s+(d.v||0),0);
+    const oPaidFat=oPaid.reduce((s,d)=>s+(d.v||0),0);
+    const oTxc=outrosDeals.length>0?(oVendas.length/outrosDeals.length*100).toFixed(1)+'%':'-';
+    const oTk=oVendas.length>0?oFat/oVendas.length:0;
+    h+='<tr style="opacity:0.8">';
+    h+='<td><em>Outros</em></td>';
+    h+='<td>-</td>';
+    h+='<td>'+fN(outrosDeals.length)+'</td>';
+    h+='<td><span class="tag tg">'+oVendas.length+'</span> <span style="font-size:10px;color:#6b7280">('+oPaid.length+' pago)</span></td>';
+    h+='<td>'+oTxc+'</td>';
+    h+='<td>'+fmt(oFat)+'</td>';
+    h+='<td><strong>'+fmt(oPaidFat)+'</strong></td>';
+    h+='<td>-</td>';
+    h+='<td>-</td>';
+    h+='<td>'+fmt(oTk)+'</td>';
+    h+='</tr>';
+  }
   h+='</tbody></table></div></div>';
 
   // === PRO-RATA SERVICE ATTRIBUTION for campaign-level Faturamento ===
