@@ -398,12 +398,12 @@ function render(){
   const vendidas=fd.filter(d=>d.e==='Vendida');
   const perdidas=fd.filter(d=>d.e==='Perdida');
   const emAnd=fd.filter(d=>d.e==='Em Andamento');
-  const semContato=fd.filter(d=>d.eta==='Sem contato').length;
-  const pastSC=fd.filter(d=>d.eta!=='Sem contato'&&d.eta).length;
+  const semContato=fd.filter(d=>(d.eta||'').toLowerCase()==='sem contato').length;
+  const pastSC=fd.filter(d=>d.eta&&(d.eta||'').toLowerCase()!=='sem contato').length;
 
   // Pipeline stages
   const etapas={};
-  fd.forEach(d=>{const e=d.eta||'(vazio)';etapas[e]=(etapas[e]||0)+1});
+  fd.forEach(d=>{let e=d.eta||'(vazio)';if(e.toLowerCase()==='sem contato')e='Sem contato';etapas[e]=(etapas[e]||0)+1});
   // Merge vendidas/perdidas into pipeline
   const pipelineOrder=['Sem contato','MQL','SQL','SAL','Negociacao','Vendida','Perdida'];
 
@@ -579,7 +579,7 @@ function render(){
     // Google Ads spend for this service
     if(curPlat!=='META'){
       const sGads=(GADS.campaigns||[]).filter(c=>c.cost>0&&mSvc(c.campaign_name,svc));
-      sSpend+=sGads.reduce((s,c)=>s+(c.cost||0),0);
+      sSpend+=sGads.reduce((s,c)=>s+(c.cost||0),0)*gadsDateRatio();
     }
     // CRM deals for this service
     const sDeals=DEALS.filter(d=>{
