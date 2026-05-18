@@ -344,13 +344,13 @@
     "cpc_avg": 3.83
   },
   "meta": {
-    "credentials_status": "missing",
+    "credentials_status": "api_error",
     "missing_credentials": [
       "GOOGLE_ADS_CLIENT_ID",
       "GOOGLE_ADS_CLIENT_SECRET",
       "GOOGLE_ADS_REFRESH_TOKEN",
       "GOOGLE_ADS_DEVELOPER_TOKEN"
     ],
-    "last_attempt": "2026-05-17T18:49:23.423567"
+    "last_attempt": "2026-05-18T00:09:32.991013"
   }
 }
