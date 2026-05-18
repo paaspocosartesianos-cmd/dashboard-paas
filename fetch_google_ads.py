@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 fetch_google_ads.py - Busca dados HISTORICOS de campanhas Google Ads para o dashboard PAAS
-Usa a Google Ads REST API (v18) com OAuth2 para obter metricas de campanhas.
+Usa a Google Ads REST API (v18) cm OAuth2 para obter metricas de campanhas.
 
 Busca desde 2025-01-01 ate hoje, com dados diarios por campanha.
 Sem dependencias externas (apenas stdlib).
@@ -22,7 +22,7 @@ GOOGLE_ADS_CUSTOMER_ID = os.environ.get("GOOGLE_ADS_CUSTOMER_ID", "8136550806")
 # Login customer ID - se for MCC (Manager account), coloque o ID do MCC aqui
 GOOGLE_ADS_LOGIN_CUSTOMER_ID = os.environ.get("GOOGLE_ADS_LOGIN_CUSTOMER_ID", "")
 
-API_VERSION = "v18"
+API_VERSION = "v19"
 BASE_URL = f"https://googleads.googleapis.com/{API_VERSION}"
 TOKEN_URL = "https://oauth2.googleapis.com/token"
 
