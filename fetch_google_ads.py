@@ -22,7 +22,7 @@ GOOGLE_ADS_CUSTOMER_ID = os.environ.get("GOOGLE_ADS_CUSTOMER_ID", "8136550806")
 # Login customer ID - se for MCC (Manager account), coloque o ID do MCC aqui
 GOOGLE_ADS_LOGIN_CUSTOMER_ID = os.environ.get("GOOGLE_ADS_LOGIN_CUSTOMER_ID", "")
 
-API_VERSION = "v19"
+API_VERSION = "v23"
 BASE_URL = f"https://googleads.googleapis.com/{API_VERSION}"
 TOKEN_URL = "https://oauth2.googleapis.com/token"
 
