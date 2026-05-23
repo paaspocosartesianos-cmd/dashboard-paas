@@ -1,17 +1,17 @@
 {
-  "last_updated": "2026-05-23T08:03:09",
+  "last_updated": "2026-05-23T12:53:19",
   "total_deals": 8906,
   "total_vendas": 889,
   "total_faturamento": 5316433.52,
   "funnels": [
-    "Hidropaas",
-    "Sondagem SPT",
-    "Filtro",
-    "Outorga",
     "Análise de água",
-    "Irrigação",
-    "Poço Artesiano",
+    "Outorga",
+    "Filtro",
     "Manutenção",
-    "Funil Padrão"
+    "Funil Padrão",
+    "Sondagem SPT",
+    "Poço Artesiano",
+    "Hidropaas",
+    "Irrigação"
   ]
 }
