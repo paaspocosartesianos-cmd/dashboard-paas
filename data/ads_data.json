@@ -9,9 +9,11 @@
       "act_568178800458922",
       "act_545763446485919"
     ],
-    "token_status": "valid",
+    "token_status": "expired",
     "daily_records": 533,
-    "campaign_daily_records": 5875
+    "campaign_daily_records": 5875,
+    "last_attempt": "2026-06-18T10:02:12.217900",
+    "error": "Token expirado ou invalido"
   },
   "kpis": {
     "investimento": 7538.329999999999,
